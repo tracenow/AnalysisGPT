@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>使用案例 on FastGPT</title><link>/docs/use-cases/</link><description>Recent content in 使用案例 on FastGPT</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><atom:link href="/docs/use-cases/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 高级配置说明</title><link>/docs/use-cases/ai_settings/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/use-cases/ai_settings/</guid><description>在 FastGPT 的 AI 对话模块中，有一个 AI 高级配置，里面包含了 AI 模型的参数配置，本文详细介绍这些配置的含义。
 返回AI内容 link这是一个开关，打开的时候，当 AI 对话模块运行时，会将其输出的内容返回到浏览器（API响应）；如果关闭，AI 输出的内容不会返回到浏览器，但是生成的内容仍可以通过【AI回复】进行输出。你可以将【AI回复】连接到其他模块中。
-温度 link可选范围0-10，约大代表生成的内容约自由扩散，越小代表约严谨。调节能力有限，知识库问答场景通常设置为0。
+温度 link可选范围0-10，越大代表生成的内容越自由扩散，越小代表约严谨。调节能力有限，知识库问答场景通常设置为0。
 回复上限 link控制 AI 回复的最大 Tokens，较小的值可以一定程度上减少 AI 的废话，但也可能导致 AI 回复不完整。
 引用模板 &amp;amp; 引用提示词 link这两个参数与知识库问答场景相关，可以控制知识库相关的提示词。
 AI 对话消息组成 link想使用明白这两个变量，首先要了解传递传递给 AI 模型的消息格式。它是一个数组，FastGPT 中这个数组的组成形式为：
