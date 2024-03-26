@@ -8,7 +8,7 @@ warning 注意，ChatGLM2-6B 权重对学术研究完全开放，在获得官方
 类型 内存 显存 硬盘空间 启动命令 base &amp;gt;=4GB &amp;gt;=3GB &amp;gt;=8GB python app.py 部署 link环境要求 link Python 3.10.11 CUDA 11.7 科学上网环境 源码部署 link 根据上面的环境配置配置好环境，具体教程自行 GPT； 下载 python 文件 在命令行输入命令 pip install -r requirements.txt； 按照https://huggingface.co/BAAI/bge-reranker-base下载模型仓库到app.py同级目录 添加环境变量 export ACCESS_TOKEN=XXXXXX 配置 token，这里的 token 只是加一层验证，防止接口被人盗用，默认值为 ACCESS_TOKEN ； 执行命令 python app.py。 然后等待模型下载，直到模型加载完毕为止。如果出现报错先问 GPT。
 启动成功后应该会显示如下地址：
 这里的 http://0.0.0.0:6006 就是连接地址。
-docker 部署 link 镜像名: luanshaotong/reranker:v0.1 端口号: 6006 大小：约8GB 设置安全凭证（即oneapi中的渠道密钥）
+docker 部署 link 镜像名: luanshaotong/reranker:v0.2 端口号: 6006 大小：约8GB 设置安全凭证（即oneapi中的渠道密钥）
 ACCESS_TOKEN=mytoken 运行命令示例
 无需GPU环境，使用CPU运行 docker run -d --name reranker -p 6006:6006 -e ACCESS_TOKEN=mytoken luanshaotong/reranker:v0.</description></item><item><title>接入 M3E 向量模型</title><link>/docs/development/custom-models/m3e/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/development/custom-models/m3e/</guid><description>前言 linkFastGPT 默认使用了 openai 的 embedding 向量模型，如果你想私有部署的话，可以使用 M3E 向量模型进行替换。M3E 向量模型属于小模型，资源使用不高，CPU 也可以运行。下面教程是基于 “睡大觉” 同学提供的一个的镜像。
 部署镜像 link镜像名: stawky/m3e-large-api:latest

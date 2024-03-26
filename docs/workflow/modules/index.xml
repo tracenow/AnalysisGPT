@@ -12,7 +12,15 @@ type DataType = { dataset_id?: string; id?: string; q: string; a: string; source
 将我的问题直接翻译成英文，不要回答问题
 历史记录 link通常需要一些历史记录，才能更完整的提取用户问题。例如上图中需要提供姓名、时间和实验室名，用户可能一开始只给了时间和实验室名，没有提供自己的姓名。再经过一轮缺失提示后，用户输入了姓名，此时需要结合上一次的记录才能完整的提取出 3 个内容。
 目标字段 link目标字段与提取的结果相对应，从上图可以看到，每增加一个字段，输出会增加一个对应的出口。
-key: 字段的唯一标识，不可重复！ 字段描述：描述该字段是关于什么的，例如：姓名、时间、搜索词等等。 必须：是否强制模型提取该字段，可能提取出来是空字符串。 输出介绍 link 字段完全提取：说明用户的问题中包含需要提取的所有内容。 提取字段缺失：与 “字段完全提取” 对立，有缺失提取的字段时触发。 完整提取结果: 一个 JSON 字符串，包含所有字段的提取结果。 目标字段提取结果：类型均为字符串。</description></item><item><title>用户引导</title><link>/docs/workflow/modules/guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/guide/</guid><description>特点 link 仅可添加 1 个 无外部输入 不参与实际调度 如图，可以在用户提问前给予一定引导。并可以设置引导问题。</description></item><item><title>自定义反馈</title><link>/docs/workflow/modules/custom_feedback/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/custom_feedback/</guid><description>该模块为临时模块，后续会针对该模块进行更全面的设计。
+key: 字段的唯一标识，不可重复！ 字段描述：描述该字段是关于什么的，例如：姓名、时间、搜索词等等。 必须：是否强制模型提取该字段，可能提取出来是空字符串。 输出介绍 link 字段完全提取：说明用户的问题中包含需要提取的所有内容。 提取字段缺失：与 “字段完全提取” 对立，有缺失提取的字段时触发。 完整提取结果: 一个 JSON 字符串，包含所有字段的提取结果。 目标字段提取结果：类型均为字符串。</description></item><item><title>用户引导</title><link>/docs/workflow/modules/guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/guide/</guid><description>特点 link 仅可添加 1 个 无外部输入 不参与实际调度 作用 link可以配置欢迎语、全局变量、语言播报等，类似于系统设置，不参与工作流的运行。
+欢迎语 link会在对话开始前发送一个欢迎语。该功能只在网页生效，API是无效的，并且该欢迎语不会被加入 AI 的对话记录中。
+可以通过特殊的 Markdown 语法，来实现快速提问。 如图中的：
+[剧情介绍] [导演是谁] 全局变量 link 如上图中，我们配置了一个名为测试, key为test的变量，类型为文本的全局变量。并在对话中，通过{{test}}来引用该变量。
+从上图中，可以看出，实际的提示词从：这是一个变量测试: {{test}} 变成了: 这是一个变量测试: 变量测试，因为{{test}} 被变量替换了。
+变量在工作流中大部分的文本输入框都生效，例如：HTTP模块的URL和参数、各种功能块的提示词。
+有一个特殊类型的变量，交外部传入。这种变量不需要用户填写，而是直接在调用时实时传入。目前支持从分享链接的Query和API调用的variables对象中获取。
+除了自定义的全局变量外，还有一些系统参数可以选择：
+cTime: 当前时间，字符串格式，例如：2023/3/3 20:22 语音播报 link 猜你想问 link开启后，每次对话结束，会发送最近的6条对话记录给AI，AI会根据这些对话记录，给出 3 个可能的问题。</description></item><item><title>自定义反馈</title><link>/docs/workflow/modules/custom_feedback/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/custom_feedback/</guid><description>该模块为临时模块，后续会针对该模块进行更全面的设计。
 特点 link 可重复添加 无外部输入 自动执行 介绍 link自定义反馈模块，可以为你的对话增加一个反馈标记，从而方便在后台更好的分析对话的数据。
 在调试模式下，不会记录反馈内容，而是直接提示: 自动反馈测试: 反馈内容。
 在对话模式（对话、分享窗口、带 chatId 的 API 调用）时，会将反馈内容记录到对话日志中。（会延迟60s记录）
@@ -41,15 +49,13 @@ Laf 是云开发平台，可以快速的开发应用 Laf 是一个开源的 BaaS
 图 1 图 2 【知识库搜索】模块中，由于引用内容始终会有输出，会导致【AI 对话】模块的引用内容输入无论有没有搜到内容都会被赋值。如果此时不连接触发器（图 2），在搜索结束后必定会执行【AI 对话】模块。
 有时候，你可能希望空搜索时候进行额外处理，例如：回复固定内容、调用其他提示词的 GPT、发送一个 HTTP 请求…… 此时就需要用到触发器，需要将 搜索结果不为空 和 触发器 连接起来。
 当搜索结果为空时，【知识库搜索】模块不会输出 搜索结果不为空 的结果，因此 【AI 对话】 模块的触发器始终为空，便不会执行。
-总之，记住模块执行的逻辑就可以灵活的使用触发器：外部输入字段（有连接的才有效）全部被赋值时才会被执行。</description></item><item><title>全局变量</title><link>/docs/workflow/modules/variable/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/variable/</guid><description>特点 link 仅可添加 1 个 需要手动配置 对其他模块有影响 可作为用户引导 说明 link可以在对话前设置一些问题，让用户输入或选择，并将用户输入/选择的结果注入到其他模块中。目前仅会注入到 string 类型的数据里（对应蓝色圆圈的输入）。
-如下图，定义了两个变量：目标语言和下拉框测试（忽略）
-用户在对话前会被要求先填写目标语言，配合用户引导，我们就构建了一个简单的翻译机器人。目标语言的 key：language 被写入到【AI 对话】模块的限定词里。
-通过完整对话记录我们可以看到，实际的限定词从：“将我的问题直接翻译成{{language}}” 变成了 “将我的问题直接翻译成英语”，因为 {{language}} 被变量替换了。
-系统级变量 link除了用户自定义设置的变量外，还会有一些系统变量：
-cTime: 当前时间。例如：2023/3/3 20:22</description></item><item><title>判断器</title><link>/docs/workflow/modules/tfswitch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/tfswitch/</guid><description>特点 link 可重复添加 有外部输入 触发执行 功能 link对任意输入内容进行 True False 输出，默认情况下，当传入的内容为 false, undefined, null,0,none 时，会输出 false。
+总之，记住模块执行的逻辑就可以灵活的使用触发器：外部输入字段（有连接的才有效）全部被赋值时才会被执行。</description></item><item><title>判断器</title><link>/docs/workflow/modules/tfswitch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/tfswitch/</guid><description>特点 link 可重复添加 有外部输入 触发执行 功能 link对任意输入内容进行 True False 输出，默认情况下，当传入的内容为 false, undefined, null,0,none 时，会输出 false。
 也可以增加自定义规则来补充输出 false 的内容，每行代表一个匹配规则，支持正则表达式。
-根据上方示例图的匹配规则，当我们输入123 hi 你好 和任意手机号码时（正则匹配）同样也会输出 False 。
-作用 link适用场景有：让大模型做判断后输出固定内容，根据大模型回复内容判断是否触发后续模块。</description></item><item><title>文本加工</title><link>/docs/workflow/modules/text_editor/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/text_editor/</guid><description>特点 link 可重复添加 有外部输入 触发执行 手动配置 功能 link对输入文本进行固定加工处理，入参仅支持字符串和数字格式，入参以变量形式使用在文本编辑区域。
+例子1
+不填写任何自定义 False 规则。
+输入 输出 123 true 这是一段文本 true false false 0 false null false 例子2
+自定义 False 规则:
+123 你好 aa /dd/ 输入 输出 说明 123 false 命中自定义 false 规则 这是一段文本 true 未命中 false false 命中自定义 内置 规则 0 false 命中自定义 内置 规则 null false 命中自定义 内置 规则 aa false 命中自定义 false 规则 aaa true 未命中 bb false 命中自定义 false 规则 bbb false 命中自定义 false 规则（正则匹配通过） 作用 link适用场景有：让大模型做判断后输出固定内容，根据大模型回复内容判断是否触发后续模块。</description></item><item><title>文本加工</title><link>/docs/workflow/modules/text_editor/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/text_editor/</guid><description>特点 link 可重复添加 有外部输入 触发执行 手动配置 功能 link对输入文本进行固定加工处理，入参仅支持字符串和数字格式，入参以变量形式使用在文本编辑区域。
 根据上方示例图的处理方式，对任何输入都会在前面拼接“我的问题是：”。
 作用 link给任意模块输入自定格式文本，或处理 AI 模块系统提示词。
 示例 link 接入谷歌搜索</description></item><item><title>问题优化（已合并到知识库搜索）</title><link>/docs/workflow/modules/coreferenceresolution/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/coreferenceresolution/</guid><description>特点 link 可重复添加 有外部输入 触发执行 背景 link在 RAG 中，我们需要根据输入的问题去数据库里执行 embedding 搜索，查找相关的内容，从而查找到相似的内容（简称知识库搜索）。
