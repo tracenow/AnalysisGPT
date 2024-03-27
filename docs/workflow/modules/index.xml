@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>模块介绍 on FastGPT</title><link>/docs/workflow/modules/</link><description>Recent content in 模块介绍 on FastGPT</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><atom:link href="/docs/workflow/modules/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 对话</title><link>/docs/workflow/modules/ai_chat/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/ai_chat/</guid><description>特点 link 可重复添加（复杂编排时防止线太乱，可以更美观） 有外部输入 有静态配置 触发执行 核心模块 参数说明 link对话模型 link可以通过 config.json 配置可选的对话模型，通过 one-api 来实现多模型接入。
-温度 &amp;amp; 回复上限 link 温度：越低回答越严谨，少废话（实测下来，感觉差别不大） 回复上限：最大回复 token 数量（只有 OpenAI 模型有效）。注意，是回复！不是总 tokens。 系统提示词（可被外部输入覆盖） link被放置在上下文数组的最前面，role 为 system，用于引导模型。具体用法参考各搜索引擎的教程~
-限定词（可被外部输入覆盖） link与系统提示词类似，role 也是 system 类型，只不过位置会被放置在问题前，拥有更强的引导作用。
-引用内容 link接收一个外部输入的数组，主要是由【知识库搜索】模块生成，也可以由 HTTP 模块从外部引入。数据结构示例如下：
-type DataType = { dataset_id?: string; id?: string; q: string; a: string; source?: string; }; // 如果是外部引入的内容，尽量不要携带 dataset_id 和 id const quoteList: DataType[] = [ { dataset_id: &amp;#39;11&amp;#39;, id: &amp;#39;222&amp;#39;, q: &amp;#39;你还&amp;#39;, a: &amp;#39;哈哈&amp;#39;, source: &amp;#39;&amp;#39; }, { dataset_id: &amp;#39;11&amp;#39;, id: &amp;#39;333&amp;#39;, q: &amp;#39;你还&amp;#39;, a: &amp;#39;哈哈&amp;#39;, source: &amp;#39;&amp;#39; }, { dataset_id: &amp;#39;11&amp;#39;, id: &amp;#39;444&amp;#39;, q: &amp;#39;你还&amp;#39;, a: &amp;#39;哈哈&amp;#39;, source: &amp;#39;&amp;#39; } ]; 完整上下文组成 link最终发送给 LLM 大模型的数据是一个数组，内容和顺序如下：</description></item><item><title>内容提取</title><link>/docs/workflow/modules/content_extract/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/content_extract/</guid><description>特点 link 可重复添加 有外部输入 需要手动配置 触发执行 function_call 模块 核心模块 功能 link从文本中提取结构化数据，通常是配合 HTTP 模块实现扩展。也可以做一些直接提取操作，例如：翻译。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>模块介绍 on FastGPT</title><link>/docs/workflow/modules/</link><description>Recent content in 模块介绍 on FastGPT</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><atom:link href="/docs/workflow/modules/index.xml" rel="self" type="application/rss+xml"/><item><title>AI 对话</title><link>/docs/workflow/modules/ai_chat/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/ai_chat/</guid><description>特点 link 可重复添加 有外部输入 有静态配置 触发执行 核心模块 参数说明 linkAI模型 link可以通过 config.json 配置可选的对话模型，通过 one-api 来实现多模型接入。
+点击AI模型后，可以配置模型的相关参数。
+🍅
+具体配置参数介绍可以参考: AI参数配置说明</description></item><item><title>内容提取</title><link>/docs/workflow/modules/content_extract/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/content_extract/</guid><description>特点 link 可重复添加 有外部输入 需要手动配置 触发执行 function_call 模块 核心模块 功能 link从文本中提取结构化数据，通常是配合 HTTP 模块实现扩展。也可以做一些直接提取操作，例如：翻译。
 参数说明 link提取要求描述 link顾名思义，给模型设置一个目标，需要提取哪些内容。
 示例 1
 你是实验室预约助手，从对话中提取出姓名，预约时间，实验室号。当前时间 {{cTime}}
@@ -12,29 +11,27 @@ type DataType = { dataset_id?: string; id?: string; q: string; a: string; source
 将我的问题直接翻译成英文，不要回答问题
 历史记录 link通常需要一些历史记录，才能更完整的提取用户问题。例如上图中需要提供姓名、时间和实验室名，用户可能一开始只给了时间和实验室名，没有提供自己的姓名。再经过一轮缺失提示后，用户输入了姓名，此时需要结合上一次的记录才能完整的提取出 3 个内容。
 目标字段 link目标字段与提取的结果相对应，从上图可以看到，每增加一个字段，输出会增加一个对应的出口。
-key: 字段的唯一标识，不可重复！ 字段描述：描述该字段是关于什么的，例如：姓名、时间、搜索词等等。 必须：是否强制模型提取该字段，可能提取出来是空字符串。 输出介绍 link 字段完全提取：说明用户的问题中包含需要提取的所有内容。 提取字段缺失：与 “字段完全提取” 对立，有缺失提取的字段时触发。 完整提取结果: 一个 JSON 字符串，包含所有字段的提取结果。 目标字段提取结果：类型均为字符串。</description></item><item><title>用户引导</title><link>/docs/workflow/modules/guide/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/guide/</guid><description>特点 link 仅可添加 1 个 无外部输入 不参与实际调度 作用 link可以配置欢迎语、全局变量、语言播报等，类似于系统设置，不参与工作流的运行。
-欢迎语 link会在对话开始前发送一个欢迎语。该功能只在网页生效，API是无效的，并且该欢迎语不会被加入 AI 的对话记录中。
-可以通过特殊的 Markdown 语法，来实现快速提问。 如图中的：
-[剧情介绍] [导演是谁] 全局变量 link 如上图中，我们配置了一个名为测试, key为test的变量，类型为文本的全局变量。并在对话中，通过{{test}}来引用该变量。
-从上图中，可以看出，实际的提示词从：这是一个变量测试: {{test}} 变成了: 这是一个变量测试: 变量测试，因为{{test}} 被变量替换了。
-变量在工作流中大部分的文本输入框都生效，例如：HTTP模块的URL和参数、各种功能块的提示词。
-有一个特殊类型的变量，交外部传入。这种变量不需要用户填写，而是直接在调用时实时传入。目前支持从分享链接的Query和API调用的variables对象中获取。
-除了自定义的全局变量外，还有一些系统参数可以选择：
-cTime: 当前时间，字符串格式，例如：2023/3/3 20:22 语音播报 link 猜你想问 link开启后，每次对话结束，会发送最近的6条对话记录给AI，AI会根据这些对话记录，给出 3 个可能的问题。</description></item><item><title>自定义反馈</title><link>/docs/workflow/modules/custom_feedback/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/custom_feedback/</guid><description>该模块为临时模块，后续会针对该模块进行更全面的设计。
+key: 字段的唯一标识，不可重复！ 字段描述：描述该字段是关于什么的，例如：姓名、时间、搜索词等等。 必须：是否强制模型提取该字段，可能提取出来是空字符串。 输出介绍 link 字段完全提取：说明用户的问题中包含需要提取的所有内容。 提取字段缺失：与 “字段完全提取” 对立，有缺失提取的字段时触发。 完整提取结果: 一个 JSON 字符串，包含所有字段的提取结果。 目标字段提取结果：类型均为字符串。</description></item><item><title>自定义反馈</title><link>/docs/workflow/modules/custom_feedback/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/custom_feedback/</guid><description>该模块为临时模块，后续会针对该模块进行更全面的设计。
 特点 link 可重复添加 无外部输入 自动执行 介绍 link自定义反馈模块，可以为你的对话增加一个反馈标记，从而方便在后台更好的分析对话的数据。
 在调试模式下，不会记录反馈内容，而是直接提示: 自动反馈测试: 反馈内容。
 在对话模式（对话、分享窗口、带 chatId 的 API 调用）时，会将反馈内容记录到对话日志中。（会延迟60s记录）
-作用 link自定义反馈模块的功能类似于程序开发的埋点，便于你观测的对话中的数据。</description></item><item><title>HTTP 模块</title><link>/docs/workflow/modules/http/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/http/</guid><description>特点 link 可重复添加 有外部输入 手动配置 触发执行 核中核模块 介绍 linkHTTP 模块会向对应的地址发送一个 POST/GET 请求，携带部分系统参数及自定义参数，并接收一个 JSON 响应值，字段也是自定义。
-Params 为路径请求参数，GET请求中用的居多。 Body 为请求体，POST请求中用的居多。 Headers 为请求头，用于传递一些特殊的信息。 3 种数据中均可以通过 {{}} 来引用变量。 变量来自于全局变量、系统变量、局部传入 参数结构 link系统变量说明 link你可以将鼠标放置在请求参数旁边的问号中，里面会提示你可用的变量。
-appId: 应用的ID chatId: 当前对话的ID，测试模式下不存在。 responseChatItemId: 当前对话中，响应的消息ID，测试模式下不存在。 variables: 当前对话的全局变量。 cTime: 当前时间。 histories: 历史记录（默认最多取10条，无法修改长度） Params, Headers link不多描述，使用方法和Postman, ApiFox 基本一致，目前 Params 和 Headers 未提供语法提示，后续会加入。
+作用 link自定义反馈模块的功能类似于程序开发的埋点，便于你观测的对话中的数据。</description></item><item><title>HTTP 模块</title><link>/docs/workflow/modules/http/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/http/</guid><description>特点 link 可重复添加 有外部输入 手动配置 触发执行 核中核模块 介绍 linkHTTP 模块会向对应的地址发送一个 HTTP 请求，实际操作与 Postman 和 ApiFox 这类直流工具使用差不多。
+Params 为路径请求参数，GET请求中用的居多。 Body 为请求体，POST/PUT请求中用的居多。 Headers 为请求头，用于传递一些特殊的信息。 3 种数据中均可以通过 {{}} 来引用变量。 url 也可以通过 {{}} 来引用变量。 变量来自于全局变量、系统变量、局部传入 参数结构 link系统变量说明 link你可以将鼠标放置在请求参数旁边的问号中，里面会提示你可用的变量。
+appId: 应用的ID chatId: 当前对话的ID，测试模式下不存在。 responseChatItemId: 当前对话中，响应的消息ID，测试模式下不存在。 variables: 当前对话的全局变量。 cTime: 当前时间。 histories: 历史记录（默认最多取10条，无法修改长度） Params, Headers link不多描述，使用方法和Postman, ApiFox 基本一致。
 可通过 {{key}} 来引入变量。例如：
-key value appId {{appId}} Authorization Bearer {{token}} Body link只有POST模式下会生效。
+key value appId {{appId}} Authorization Bearer {{token}} Body link只有特定请求类型下会生效。
 可以写一个自定义的 Json，并通过 {{key}} 来引入变量。例如：
-假设有一组变量 Http 模块中的Body声明 最终得到的解析 { &amp;#34;string&amp;#34;: &amp;#34;字符串&amp;#34;, &amp;#34;number&amp;#34;: 123, &amp;#34;boolean&amp;#34;: true, &amp;#34;array&amp;#34;: [1, 2, 3], &amp;#34;obj&amp;#34;: { &amp;#34;name&amp;#34;: &amp;#34;FastGPT&amp;#34;, &amp;#34;url&amp;#34;: &amp;#34;https://fastgpt.</description></item><item><title>用户问题</title><link>/docs/workflow/modules/input/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/input/</guid><description>特点 link 可重复添加（防止复杂编排时线太乱，重复添加可以更美观） 无外部输入 流程入口 自动执行</description></item><item><title>知识库搜索</title><link>/docs/workflow/modules/dataset_search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/dataset_search/</guid><description>知识库搜索具体参数说明，以及内部逻辑请移步：FastGPT知识库搜索方案
+假设有一组变量 Http 模块中的Body声明 最终得到的解析 { &amp;#34;string&amp;#34;: &amp;#34;字符串&amp;#34;, &amp;#34;number&amp;#34;: 123, &amp;#34;boolean&amp;#34;: true, &amp;#34;array&amp;#34;: [1, 2, 3], &amp;#34;obj&amp;#34;: { &amp;#34;name&amp;#34;: &amp;#34;FastGPT&amp;#34;, &amp;#34;url&amp;#34;: &amp;#34;https://fastgpt.</description></item><item><title>对话入口</title><link>/docs/workflow/modules/input/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/input/</guid><description>特点 link 可重复添加（防止复杂编排时线太乱，重复添加可以更美观） 无外部输入 流程入口 自动执行</description></item><item><title>工具调用</title><link>/docs/workflow/modules/tool/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/tool/</guid><description> 什么是工具 link工具可以是一个系统模块，例如：AI对话、知识库搜索、HTTP模块等。也可以是一个插件。
+工具调用可以让 LLM 更动态的决策流程，而不都是固定的流程。（当然，缺点就是费tokens）
+工具的组成 link 工具介绍。通常是模块的介绍或插件的介绍，这个介绍会告诉LLM，这个工具的作用是什么。 工具参数。对于系统模块来说，工具参数已经是固定的，无需额外配置。对于插件来说，工具参数是一个可配置项。 工具是如何运行的 link要了解工具如何允许，首先需要知道它的运行条件。
+需要工具的介绍（或者叫描述）。这个介绍会告诉LLM，这个工具的作用是什么，LLM会根据上下文语义，决定是否需要调用这个工具。 工具的参数。有些工具调用时，可能需要一些特殊的参数。参数中有2个关键的值：参数介绍和是否必须。 结合工具的介绍、参数介绍和参数是否必须，LLM会决定是否调用这个工具。有以下几种情况：
+无参数的工具：直接根据工具介绍，决定是否需要执行。例如：获取当前时间。 有参数的工具： 无必须的参数：尽管上下文中，没有适合的参数，也可以调用该工具。但有时候，LLM会自己伪造一个参数。 有必须的参数：如果没有适合的参数，LLM可能不会调用该工具。可以通过提示词，引导用户提供参数。 工具调用逻辑 link在支持函数调用的模型中，可以一次性调用多个工具，调用逻辑如下：
+怎么用 link 有工具调用模块 无工具调用模块 高级编排中，一旦有了工具调用模块，可用的工具头部会出现一个菱形，可以将它与工具调用模块底部的菱形相连接。
+被连接的工具，会自动分离工具输入与普通的输入，并且可以编辑介绍，可以通过调整介绍，使得该工具调用时机更加精确。
+关于工具调用，如何调试仍然是一个玄学，所以建议，不要一次性增加太多工具，选择少量工具调优后再进一步尝试。
+相关示例 link 谷歌搜索 发送飞书webhook</description></item><item><title>知识库搜索</title><link>/docs/workflow/modules/dataset_search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/dataset_search/</guid><description>知识库搜索具体参数说明，以及内部逻辑请移步：FastGPT知识库搜索方案
 特点 link 可重复添加（复杂编排时防止线太乱，可以更美观） 有外部输入 有静态配置 触发执行 核心模块 参数说明 link输入 - 关联的知识库 link可以选择一个或多个相同向量模型的知识库，用于向量搜索。
-输入 - 相似度 link学名称为距离，两个向量之间距离，可以认为是两个向量的相似度，又可以映射成文本之间的相似度。
-需要注意的是，不同的向量模型之间的相似度是不能比较的，因为他们的距离值计算出来差距很大。例如，openai 的 embedding 模型，通常 0.8 以上的才是较为准确的内容，而 M3E 模型则是 0.35。
-输入 - 单次搜索上限 link每次触发搜索模块时，最多取 n 条作为最终引用，又称 topN。需要注意的是，取了 n 条引用不代表对话模型都可以使用，还会受对话模型最大 Tokens 的影响。
+输入 - 搜索参数 link点击查看参数介绍
 输出 - 搜索结果 link输出部分给了两个 boolean 类型的搜索结果，以便根据搜索结果进行不同的处理，通常会有下方两个处理方式：
 直接回复特定内容 对接普通的 gpt 当然，你也可以连接到 HTTP 模块，从而实现无法从知识搜索到内容时，去进行联网搜索或者维基百科搜索。
 输出 - 引用内容 link以数组格式输出引用，长度可以为 0。意味着，即使没有搜索到内容，这个输出链路也会走通。</description></item><item><title>问题分类</title><link>/docs/workflow/modules/question_classify/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/docs/workflow/modules/question_classify/</guid><description>特点 link 可重复添加 有外部输入 需要手动配置 触发执行 function_call 模块 功能 link可以将用户的问题进行分类，分类后执行不同操作。在一些较模糊的场景中，分类效果不是很明显。
