@@ -42,6 +42,7 @@ export async function getUserDetail({
     timezone: user.timezone,
     promotionRate: user.promotionRate,
     openaiAccount: user.openaiAccount,
-    team: tmb
+    team: tmb,
+    userType: user.userType
   };
 }

@@ -31,35 +31,40 @@ const Navbar = ({ unread }: { unread: number }) => {
         icon: 'core/chat/chatLight',
         activeIcon: 'core/chat/chatFill',
         link: `/chat?appId=${lastChatAppId}&chatId=${lastChatId}`,
-        activeLink: ['/chat']
+        activeLink: ['/chat'],
+        forbidUserType: ['app']
       },
       {
         label: t('navbar.Apps'),
         icon: 'core/app/aiLight',
         activeIcon: 'core/app/aiFill',
         link: `/app/list`,
-        activeLink: ['/app/list', '/app/detail']
+        activeLink: ['/app/list', '/app/detail'],
+        forbidUserType: ['app']
       },
       {
         label: t('navbar.Plugin'),
         icon: 'common/navbar/pluginLight',
         activeIcon: 'common/navbar/pluginFill',
         link: `/plugin/list`,
-        activeLink: ['/plugin/list', '/plugin/edit']
+        activeLink: ['/plugin/list', '/plugin/edit'],
+        forbidUserType: ['app']
       },
       {
         label: t('navbar.Datasets'),
         icon: 'core/dataset/datasetLight',
         activeIcon: 'core/dataset/datasetFill',
         link: `/dataset/list`,
-        activeLink: ['/dataset/list', '/dataset/detail']
+        activeLink: ['/dataset/list', '/dataset/detail'],
+        forbidUserType: ['app']
       },
       {
         label: t('navbar.Account'),
         icon: 'support/user/userLight',
         activeIcon: 'support/user/userFill',
         link: '/account',
-        activeLink: ['/account']
+        activeLink: ['/account'],
+        forbidUserType: []
       }
     ],
     [lastChatAppId, lastChatId, t]
@@ -81,7 +86,7 @@ const Navbar = ({ unread }: { unread: number }) => {
       bg: 'myGray.05',
       color: 'primary.600'
     }
-  };
+  }
 
   return (
     <Flex
@@ -106,7 +111,9 @@ const Navbar = ({ unread }: { unread: number }) => {
       </Box>
       {/* 导航列表 */}
       <Box flex={1}>
-        {navbarList.map((item) => (
+        {navbarList.filter((item) => (
+            !item?.forbidUserType?.includes(userInfo?.userType)
+        )).map((item) => (
           <Box
             key={item.link}
             {...itemStyles}
@@ -163,35 +170,35 @@ const Navbar = ({ unread }: { unread: number }) => {
           </Link>
         </Box>
       )}
-      {(feConfigs?.docUrl || feConfigs?.chatbotUrl) && (
-        <MyTooltip label={t('common.system.Use Helper')} placement={'right-end'}>
-          <Link
-            {...itemStyles}
-            {...hoverStyle}
-            href={feConfigs?.chatbotUrl || getDocPath('/docs/intro')}
-            target="_blank"
-            mb={0}
-            color={'myGray.500'}
-          >
-            <MyIcon name={'common/courseLight'} width={'24px'} height={'24px'} />
-          </Link>
-        </MyTooltip>
-      )}
-      {feConfigs?.show_git && (
-        <MyTooltip label={`Git Star: ${gitStar}`} placement={'right-end'}>
-          <Link
-            as={NextLink}
-            href="https://github.com/labring/FastGPT"
-            target={'_blank'}
-            {...itemStyles}
-            {...hoverStyle}
-            mt={0}
-            color={'myGray.500'}
-          >
-            <MyIcon name={'common/gitInlight'} width={'26px'} height={'26px'} />
-          </Link>
-        </MyTooltip>
-      )}
+      {/*{(feConfigs?.docUrl || feConfigs?.chatbotUrl) && (*/}
+        {/*<MyTooltip label={t('common.system.Use Helper')} placement={'right-end'}>*/}
+          {/*<Link*/}
+            {/*{...itemStyles}*/}
+            {/*{...hoverStyle}*/}
+            {/*href={feConfigs?.chatbotUrl || getDocPath('/docs/intro')}*/}
+            {/*target="_blank"*/}
+            {/*mb={0}*/}
+            {/*color={'myGray.500'}*/}
+          {/*>*/}
+            {/*<MyIcon name={'common/courseLight'} width={'24px'} height={'24px'} />*/}
+          {/*</Link>*/}
+        {/*</MyTooltip>*/}
+      {/*)}*/}
+      {/*{feConfigs?.show_git && (*/}
+        {/*<MyTooltip label={`Git Star: ${gitStar}`} placement={'right-end'}>*/}
+          {/*<Link*/}
+            {/*as={NextLink}*/}
+            {/*href="https://github.com/labring/FastGPT"*/}
+            {/*target={'_blank'}*/}
+            {/*{...itemStyles}*/}
+            {/*{...hoverStyle}*/}
+            {/*mt={0}*/}
+            {/*color={'myGray.500'}*/}
+          {/*>*/}
+            {/*<MyIcon name={'common/gitInlight'} width={'26px'} height={'26px'} />*/}
+          {/*</Link>*/}
+        {/*</MyTooltip>*/}
+      {/*)}*/}
     </Flex>
   );
 };

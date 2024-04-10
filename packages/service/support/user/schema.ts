@@ -2,7 +2,7 @@ import { connectionMongo, type Model } from '../../common/mongo';
 const { Schema, model, models } = connectionMongo;
 import { hashStr } from '@fastgpt/global/common/string/tools';
 import type { UserModelSchema } from '@fastgpt/global/support/user/type';
-import { UserStatusEnum, userStatusMap } from '@fastgpt/global/support/user/constant';
+import {UserStatusEnum, userStatusMap, UserTypeEnum} from '@fastgpt/global/support/user/constant';
 
 export const userCollectionName = 'users';
 
@@ -63,6 +63,10 @@ const UserSchema = new Schema({
   },
   lastLoginTmbId: {
     type: Schema.Types.ObjectId
+  },
+  userType: {
+    type: String,
+    default: UserTypeEnum.platform
   }
 });
 

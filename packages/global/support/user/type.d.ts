@@ -14,6 +14,7 @@ export type UserModelSchema = {
   openaiKey: string;
   createTime: number;
   timezone: string;
+  userType?: string;
   status: `${UserStatusEnum}`;
   lastLoginTmbId?: string;
   openaiAccount?: {
@@ -31,4 +32,5 @@ export type UserType = {
   openaiAccount: UserModelSchema['openaiAccount'];
   team: TeamItemType;
   standardInfo?: standardInfoType;
+  userType?: string;
 };

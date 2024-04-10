@@ -16,3 +16,8 @@ export enum OAuthEnum {
   google = 'google',
   wechat = 'wechat'
 }
+
+export enum UserTypeEnum {
+  platform = 'platform',
+  app = 'app'
+}
