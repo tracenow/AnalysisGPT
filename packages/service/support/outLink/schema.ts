@@ -61,7 +61,11 @@ const OutLinkSchema = new Schema({
     },
     hookUrl: {
       type: String
-    }
+    },
+    authEnable: {
+      type: Boolean,
+      default: false
+    },
   }
 });
 

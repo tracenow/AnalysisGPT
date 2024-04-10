@@ -97,7 +97,7 @@ const Share = ({ appId }: { appId: string }) => {
               <Th>{t('common.Name')}</Th>
               <Th>{t('support.outlink.Usage points')}</Th>
               <Th>{t('core.app.share.Is response quote')}</Th>
-              {feConfigs?.isPlus && (
+              {!feConfigs?.isPlus && (
                 <>
                   <Th>{t('core.app.share.Ip limit title')}</Th>
                   <Th>{t('common.Expired Time')}</Th>
@@ -114,7 +114,7 @@ const Share = ({ appId }: { appId: string }) => {
                 <Td>{item.name}</Td>
                 <Td>
                   {Math.round(item.usagePoints)}
-                  {feConfigs?.isPlus
+                  {!feConfigs?.isPlus
                     ? `${
                         item.limit?.maxUsagePoints && item.limit.maxUsagePoints > -1
                           ? ` / ${item.limit.maxUsagePoints}`
@@ -123,7 +123,7 @@ const Share = ({ appId }: { appId: string }) => {
                     : ''}
                 </Td>
                 <Td>{item.responseDetail ? '✔' : '✖'}</Td>
-                {feConfigs?.isPlus && (
+                {!feConfigs?.isPlus && (
                   <>
                     <Td>{item?.limit?.QPM || '-'}</Td>
                     <Td>
@@ -131,7 +131,7 @@ const Share = ({ appId }: { appId: string }) => {
                         ? dayjs(item.limit?.expiredTime).format('YYYY/MM/DD\nHH:mm')
                         : '-'}
                     </Td>
-                    <Th>{item?.limit?.hookUrl ? '✔' : '✖'}</Th>
+                    <Th>{item?.limit?.authEnable ? '✔' : '✖'}</Th>
                   </>
                 )}
                 <Td>{item.lastTime ? formatTimeToChatTime(item.lastTime) : t('common.Un used')}</Td>
@@ -295,7 +295,7 @@ function EditLinkModal({
             })}
           />
         </Flex>
-        {feConfigs?.isPlus && (
+        {!feConfigs?.isPlus && (
           <>
             <Flex alignItems={'center'} mt={4}>
               <Flex flex={'0 0 90px'} alignItems={'center'}>
@@ -348,25 +348,10 @@ function EditLinkModal({
             </Flex>
             <Flex alignItems={'center'} mt={4}>
               <Flex flex={'0 0 90px'} alignItems={'center'}>
-                {t('outlink.token auth')}
-                <MyTooltip label={t('outlink.token auth Tips') || ''}>
-                  <QuestionOutlineIcon ml={1} />
-                </MyTooltip>
+                {t('outlink.auth enable')}
               </Flex>
-              <Input
-                placeholder={t('outlink.token auth Tips') || ''}
-                fontSize={'sm'}
-                {...register('limit.hookUrl')}
-              />
+              <Switch {...register('limit.authEnable')} size={'lg'} />
             </Flex>
-            <Link
-              href={getDocPath('/docs/development/openapi/share')}
-              target={'_blank'}
-              fontSize={'sm'}
-              color={'myGray.500'}
-            >
-              {t('outlink.token auth use cases')}
-            </Link>
           </>
         )}
 

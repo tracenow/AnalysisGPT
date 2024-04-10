@@ -17,6 +17,7 @@ export type OutLinkSchema = {
     QPM: number;
     maxUsagePoints: number;
     hookUrl?: string;
+    authEnable?: boolean;
   };
 };
 export type OutLinkWithAppType = Omit<OutLinkSchema, 'appId'> & {
