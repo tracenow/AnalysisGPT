@@ -14,6 +14,7 @@ import { AppErrEnum } from '@fastgpt/global/common/error/code/app';
 import { MongoChat } from '@fastgpt/service/core/chat/chatSchema';
 import { ChatErrEnum } from '@fastgpt/global/common/error/code/chat';
 import { ChatRoleEnum } from '@fastgpt/global/core/chat/constants';
+import {authUserRole} from "@fastgpt/service/support/permission/auth/user";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -23,6 +24,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // auth link permission
     const { shareChat, uid, appId } = await authOutLink({ shareId, outLinkUid });
+
+    if (shareChat?.limit?.authEnable == true) {
+      // 凭证校验
+      await authUserRole({ req, authToken: true });
+    }
 
     // auth app permission
     const [tmb, chat, app] = await Promise.all([

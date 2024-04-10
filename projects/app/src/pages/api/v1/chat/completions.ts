@@ -36,6 +36,9 @@ import { setEntryEntries } from '@fastgpt/service/core/workflow/dispatch/utils';
 import { UserChatItemType } from '@fastgpt/global/core/chat/type';
 import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/module/runtime/constants';
 
+import { authOutLink } from '@/service/support/permission/auth/outLink';
+import {authUserRole} from "@fastgpt/service/support/permission/auth/user";
+
 type FastGptWebChatProps = {
   chatId?: string; // undefined: nonuse history, '': new chat, 'xxxxx': use history
   appId?: string;
@@ -129,6 +132,13 @@ export default withNextCors(async function handler(req: NextApiRequest, res: Nex
       await (async () => {
         // share chat
         if (shareId && outLinkUid) {
+            // auth link permission
+            const { shareChat, uid, appId } = await authOutLink({ shareId, outLinkUid });
+        
+            if (shareChat?.limit?.authEnable == true) {
+                // 凭证校验
+                await authUserRole({ req, authToken: true });
+            }
           return authShareChat({
             shareId,
             outLinkUid,

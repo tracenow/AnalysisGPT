@@ -30,6 +30,8 @@ import MyBox from '@/components/common/MyBox';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { OutLinkWithAppType } from '@fastgpt/global/support/outLink/type';
 
+import { useUserStore } from '@/web/support/user/useUserStore';
+
 const OutLink = ({
                      appName,
                      appIntro,
@@ -62,6 +64,7 @@ const OutLink = ({
     const initSign = useRef(false);
     const [isEmbed, setIdEmbed] = useState(true);
 
+    const { userInfo } = useUserStore();
     const { localUId } = useShareChatStore();
     const {
         histories,
@@ -75,7 +78,7 @@ const OutLink = ({
         clearHistories
     } = useChatStore();
     const appId = chatData.appId;
-    const outLinkUid: string = authToken || localUId;
+    const outLinkUid: string = userInfo?._id || authToken || localUId;
 
     const startChat = useCallback(
         async ({ messages, controller, generatingMessage, variables }: StartChatFnProps) => {

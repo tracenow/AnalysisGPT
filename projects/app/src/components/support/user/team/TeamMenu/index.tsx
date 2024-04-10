@@ -36,10 +36,10 @@ const TeamMenu = () => {
         if (feConfigs.isPlus) {
           onOpen();
         } else {
-          toast({
-            status: 'warning',
-            title: t('common.Business edition features')
-          });
+          // toast({
+          //   status: 'warning',
+          //   title: t('common.Business edition features')
+          // });
         }
       }}
     >

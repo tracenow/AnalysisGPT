@@ -112,7 +112,7 @@ const Navbar = ({ unread }: { unread: number }) => {
       {/* 导航列表 */}
       <Box flex={1}>
         {navbarList.filter((item) => (
-            !item?.forbidUserType?.includes(userInfo?.userType)
+            userInfo?.userType && !item?.forbidUserType?.includes(userInfo?.userType)
         )).map((item) => (
           <Box
             key={item.link}
