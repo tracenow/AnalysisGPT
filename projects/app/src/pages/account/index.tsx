@@ -154,10 +154,14 @@ const Account = ({ currentTab }: { currentTab: `${TabEnum}` }) => {
                 onChange={setCurrentTab}
               />
               <Flex alignItems={'center'}>
-                <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />
-                <Box fontSize={'md'} ml={2}>
-                  V{systemVersion}
-                </Box>
+                  {isPlatformUser && (
+                      <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />
+                  )}
+                {isPlatformUser && (
+                    <Box fontSize={'md'} ml={2}>
+                        V{systemVersion}
+                    </Box>
+                )}
               </Flex>
             </Flex>
           ) : (
