@@ -2,7 +2,7 @@ import React, { useState, Dispatch, useCallback } from 'react';
 import { FormControl, Flex, Input, Button, Box, Link } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { LoginPageTypeEnum } from '@/constants/user';
-import { postLogin } from '@/web/support/user/api';
+import { postAuthLogin } from '@/web/support/user/api';
 import type { ResLogin } from '@/global/support/api/userRes';
 import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
@@ -20,7 +20,7 @@ interface LoginFormType {
   password: string;
 }
 
-const LoginForm = ({ setPageType, loginSuccess }: Props) => {
+const LoginAuthForm = ({ setPageType, loginSuccess }: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { feConfigs } = useSystemStore();
@@ -37,7 +37,7 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
       setRequesting(true);
       try {
         loginSuccess(
-          await postLogin({
+          await postAuthLogin({
             username,
             password
           })
@@ -106,27 +106,6 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
             })}
           ></Input>
         </FormControl>
-        {feConfigs?.docUrl && (
-          <Flex alignItems={'center'} mt={7} fontSize={'sm'}>
-            {t('support.user.login.Policy tip')}
-            <Link
-              ml={1}
-              href={getDocPath('/docs/agreement/terms/')}
-              target={'_blank'}
-              color={'primary.500'}
-            >
-              {t('support.user.login.Terms')}
-            </Link>
-            <Box mx={1}>{t('support.user.login.And')}</Box>
-            <Link
-              href={getDocPath('/docs/agreement/privacy/')}
-              target={'_blank'}
-              color={'primary.500'}
-            >
-              {t('support.user.login.Privacy')}
-            </Link>
-          </Flex>
-        )}
 
         <Button
           type="submit"
@@ -168,4 +147,4 @@ const LoginForm = ({ setPageType, loginSuccess }: Props) => {
   );
 };
 
-export default LoginForm;
+export default LoginAuthForm;

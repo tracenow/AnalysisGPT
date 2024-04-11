@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       userId: user._id
     });
 
-    if (!(userDetail?.userType == UserTypeEnum.platform)) {
+    if (!(userDetail?.userType == UserTypeEnum.app)) {
       throw new Error('用户未注册');
     }
 

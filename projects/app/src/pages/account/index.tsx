@@ -35,6 +35,7 @@ const Account = ({ currentTab }: { currentTab: `${TabEnum}` }) => {
   const { t } = useTranslation();
   const { userInfo, setUserInfo } = useUserStore();
   const { feConfigs, isPc, systemVersion } = useSystemStore();
+  const isPlatformUser = userInfo?.userType == 'platform';
 
   const tabList = [
     {
@@ -113,7 +114,11 @@ const Account = ({ currentTab }: { currentTab: `${TabEnum}` }) => {
       if (tab === TabEnum.loginout) {
         openConfirm(() => {
           setUserInfo(null);
-          router.replace('/login');
+          if (isPlatformUser) {
+              router.replace('/login');
+          } else {
+            router.replace('/login/auth');
+          }
         })();
       } else {
         router.replace({

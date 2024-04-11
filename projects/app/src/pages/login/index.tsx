@@ -105,7 +105,7 @@ const Login = () => {
               </Center>
             )}
           </Box>
-          {!feConfigs?.concatMd && (
+          {feConfigs?.concatMd && (
             <Box
               mt={8}
               color={'primary.700'}

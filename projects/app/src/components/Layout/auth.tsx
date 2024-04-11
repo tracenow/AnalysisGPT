@@ -7,6 +7,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 const unAuthPage: { [key: string]: boolean } = {
   '/': true,
   '/login': true,
+  '/login/auth': true,
   '/login/provider': true,
   '/login/fastlogin': true,
   '/appStore': true,
@@ -34,9 +35,16 @@ const Auth = ({ children }: { children: JSX.Element }) => {
     {
       onError(error) {
         console.log('error->', error);
-        router.replace(
-          `/login?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
-        );
+        if (location?.pathname == '/chat/app') {
+          router.replace(
+              `/login/auth?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
+          );
+        } else {
+          router.replace(
+              `/login?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
+          );
+        }
+
         toast({
           status: 'warning',
           title: t('support.user.Need to login')
