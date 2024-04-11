@@ -8,7 +8,7 @@ import { useToast } from '@fastgpt/web/hooks/useToast';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { getDocPath } from '@/web/common/system/doc';
 import { useTranslation } from 'next-i18next';
-import FormLayout from './components/FormLayout';
+import AuthFormLayout from './components/AuthFormLayout';
 
 interface Props {
   setPageType: Dispatch<`${LoginPageTypeEnum}`>;
@@ -70,7 +70,7 @@ const LoginAuthForm = ({ setPageType, loginSuccess }: Props) => {
     : loginOptions.join('/');
 
   return (
-    <FormLayout setPageType={setPageType} pageType={LoginPageTypeEnum.passwordLogin}>
+    <AuthFormLayout setPageType={setPageType} pageType={LoginPageTypeEnum.passwordLogin}>
       <Box
         mt={'42px'}
         onKeyDown={(e) => {
@@ -143,7 +143,7 @@ const LoginAuthForm = ({ setPageType, loginSuccess }: Props) => {
           </>
         )}
       </Box>
-    </FormLayout>
+    </AuthFormLayout>
   );
 };
 

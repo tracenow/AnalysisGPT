@@ -76,7 +76,7 @@ const Login = () => {
     <Flex
     alignItems={'center'}
     justifyContent={'center'}
-    bg={`url('/icon/login-bg.svg') no-repeat`}
+    bg={`url('/icon/login-analysis-bg.svg') no-repeat`}
     backgroundSize={'cover'}
     userSelect={'none'}
     h={'100%'}
@@ -106,8 +106,6 @@ const Login = () => {
     )}
     </Box>
     </Flex>
-
-    {isOpen && <CommunityModal onClose={onClose} />}
     </Flex>
     </>
     );
