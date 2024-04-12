@@ -27,7 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (shareChat?.limit?.authEnable == true) {
       // 凭证校验
-      await authUserRole({ req, authToken: true });
+      const { teamId, tmbId, teamOwner, role } = await authUserRole({ req, authToken: true });
+      if (!(shareChat?.limit?.shareTeam == teamId)) {
+        throw new Error(ChatErrEnum.unAuthChat);
+      }
     }
 
     // auth app permission

@@ -11,12 +11,15 @@ import {
 import type { TeamTagItemType, TeamTagSchema } from '@fastgpt/global/support/user/team/type';
 import {
   TeamItemType,
+  TeamListItemType,
   TeamMemberItemType,
   TeamMemberSchema
 } from '@fastgpt/global/support/user/team/type.d';
 import { FeTeamPlanStatusType, TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 
 /* --------------- team  ---------------- */
+export const getAllTeamList = () =>
+    GET<TeamListItemType[]>(`/support/user/team/list`, {});
 export const getTeamList = (status: `${TeamMemberSchema['status']}`) =>
   GET<TeamItemType[]>(`/proApi/support/user/team/list`, { status });
 export const postCreateTeam = (data: CreateTeamProps) =>

@@ -1208,6 +1208,9 @@
     "QPM Tips": "每个 IP 每分钟最多提问多少次",
     "QPM is empty": "QPM 不能为空",
     "auth enable": "身份验证",
+    "choose share team": "选择共享的团队",
+    "current share team": "当前团队共享",
+    "share team": "团队共享",
     "token auth": "身份验证",
     "token auth Tips": "身份校验服务器地址，如填写该值，每次对话前都会向指定服务器发送一个请求，进行身份校验",
     "token auth use cases": "查看身份验证使用说明"

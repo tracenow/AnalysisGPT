@@ -1,0 +1,46 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { jsonRes } from '@fastgpt/service/common/response';
+import { connectToDatabase } from '@/service/mongo';
+import { MongoApp } from '@fastgpt/service/core/app/schema';
+import {MongoOutLink} from '@fastgpt/service/support/outLink/schema';
+import { AppListItemType } from '@fastgpt/global/core/app/type';
+import { authUserRole } from '@fastgpt/service/support/permission/auth/user';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
+  try {
+    await connectToDatabase();
+    // 凭证校验
+    const { teamId, tmbId, teamOwner, role } = await authUserRole({ req, authToken: true });
+
+    // 根据teamId获取被分享的应用
+    const myOutLinks = await MongoOutLink.find({"limit.shareTeam": teamId, "type": "share"}, '_id appId shareId')
+    const shareAppDict = myOutLinks.reduce((acc, curr) => {
+      acc[curr.appId] = curr.shareId
+      return acc;
+    }, {})
+    console.log(Object.keys(shareAppDict))
+    // 根据 userId 获取模型信息
+    const myApps = await MongoApp.find(
+      { _id: {$in: Object.keys(shareAppDict)} },
+      '_id avatar name intro tmbId permission'
+    ).sort({
+      updateTime: -1
+    });
+    jsonRes<AppListItemType[]>(res, {
+      data: myApps.map((app) => ({
+        _id: app._id,
+        shareId: shareAppDict[app._id],
+        avatar: app.avatar,
+        name: app.name,
+        intro: app.intro,
+        isOwner: teamOwner || String(app.tmbId) === tmbId,
+        permission: app.permission
+      }))
+    });
+  } catch (err) {
+    jsonRes(res, {
+      code: 500,
+      error: err
+    });
+  }
+}

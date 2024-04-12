@@ -66,6 +66,9 @@ const OutLinkSchema = new Schema({
       type: Boolean,
       default: false
     },
+    shareTeam: {
+      type: String
+    },
   }
 });
 

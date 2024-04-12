@@ -36,7 +36,7 @@ const Login = () => {
             setUserInfo(res.user);
             setToken(res.token);
             setTimeout(() => {
-                router.push(lastRoute ? decodeURIComponent(lastRoute) : '/app/list');
+                router.push(lastRoute ? decodeURIComponent(lastRoute) : '/app/share');
             }, 300);
         },
         [lastRoute, router, setLastChatId, setLastChatAppId, setUserInfo]

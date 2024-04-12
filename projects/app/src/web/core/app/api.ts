@@ -11,6 +11,11 @@ import type { CreateAppParams, AppUpdateParams } from '@fastgpt/global/core/app/
 export const getMyApps = () => GET<AppListItemType[]>('/core/app/list');
 
 /**
+ * 获取分享模型列表
+ */
+export const getMyShareApps = () => GET<AppListItemType[]>('/core/app/share/list');
+
+/**
  * 创建一个模型
  */
 export const postCreateApp = (data: CreateAppParams) => POST<string>('/core/app/create', data);

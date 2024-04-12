@@ -18,6 +18,7 @@ export type OutLinkSchema = {
     maxUsagePoints: number;
     hookUrl?: string;
     authEnable?: boolean;
+    shareTeam?: string;
   };
 };
 export type OutLinkWithAppType = Omit<OutLinkSchema, 'appId'> & {

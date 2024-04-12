@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { getMyApps, getModelById, putAppById, replaceAppById } from '@/web/core/app/api';
+import { getMyApps, getMyShareApps, getModelById, putAppById, replaceAppById } from '@/web/core/app/api';
 import { defaultApp } from '@/constants/app';
 import type { AppUpdateParams } from '@fastgpt/global/core/app/api.d';
 import { AppDetailType, AppListItemType } from '@fastgpt/global/core/app/type.d';
@@ -9,6 +9,7 @@ import { AppDetailType, AppListItemType } from '@fastgpt/global/core/app/type.d'
 type State = {
   myApps: AppListItemType[];
   loadMyApps: (init?: boolean) => Promise<AppListItemType[]>;
+  loadMyShareApps: (init?: boolean) => Promise<AppListItemType[]>;
   appDetail: AppDetailType;
   loadAppDetail: (id: string, init?: boolean) => Promise<AppDetailType>;
   updateAppDetail(appId: string, data: AppUpdateParams): Promise<void>;
@@ -21,6 +22,14 @@ export const useAppStore = create<State>()(
     persist(
       immer((set, get) => ({
         myApps: [],
+        async loadMyShareApps(init = true) {
+              if (get().myApps.length > 0 && !init) return [];
+              const res = await getMyShareApps();
+              set((state) => {
+                  state.myApps = res;
+              });
+              return res;
+          },
         async loadMyApps(init = true) {
           if (get().myApps.length > 0 && !init) return [];
           const res = await getMyApps();

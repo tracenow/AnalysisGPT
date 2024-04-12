@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import {
   Flex,
   Box,
@@ -15,6 +15,7 @@ import {
   Input,
   Switch,
   Link,
+  Select,
   IconButton
 } from '@chakra-ui/react';
 import { QuestionOutlineIcon } from '@chakra-ui/icons';
@@ -27,6 +28,9 @@ import {
   createShareChat,
   putShareChat
 } from '@/web/support/outLink/api';
+import {
+  getAllTeamList
+} from '@/web/support/user/team/api';
 import { formatTimeToChatTime } from '@/utils/tools';
 import { useCopyData } from '@/web/common/hooks/useCopyData';
 import { useForm } from 'react-hook-form';
@@ -44,6 +48,8 @@ import { getDocPath } from '@/web/common/system/doc';
 import dynamic from 'next/dynamic';
 import MyMenu from '@/components/MyMenu';
 import { useConfirm } from '@fastgpt/web/hooks/useConfirm';
+import {UserUpdateParams} from "@/types/user";
+import {UserType} from "@fastgpt/global/support/user/type";
 
 const SelectUsingWayModal = dynamic(() => import('./SelectUsingWayModal'));
 
@@ -278,6 +284,9 @@ function EditLinkModal({
     onSuccess: onEdit
   });
 
+  const {
+    data: teamList = [],
+  } = useQuery(['getAllTeamList'], () => getAllTeamList());
   return (
     <MyModal
       isOpen={true}
@@ -346,12 +355,6 @@ function EditLinkModal({
                 }}
               />
             </Flex>
-            <Flex alignItems={'center'} mt={4}>
-              <Flex flex={'0 0 90px'} alignItems={'center'}>
-                {t('outlink.auth enable')}
-              </Flex>
-              <Switch {...register('limit.authEnable')} size={'lg'} />
-            </Flex>
           </>
         )}
 
@@ -363,6 +366,32 @@ function EditLinkModal({
             </MyTooltip>
           </Flex>
           <Switch {...register('responseDetail')} size={'lg'} />
+        </Flex>
+        <Flex alignItems={'center'} mt={4}>
+        <Flex flex={'0 0 90px'} alignItems={'center'}>
+        {t('outlink.auth enable')}
+        </Flex>
+            <Switch {...register('limit.authEnable')} size={'lg'} />
+        </Flex>
+      <Flex alignItems={'center'}  mt={4}>
+      <Box flex={'0 0 90px'}>{t('outlink.current share team')}</Box>
+      <Select value={defaultData?.limit?.shareTeam} isDisabled>
+      {teamList.map((item) => (
+          <option key={item._id} value={item._id}>
+            {item.name}
+          </option>
+      ))}
+      </Select>
+      </Flex>
+        <Flex alignItems={'center'}  mt={4}>
+          <Box flex={'0 0 90px'}>{t('outlink.share team')}</Box>
+          <Select {...register('limit.shareTeam')} placeholder={t('outlink.choose share team') } defaultValue={defaultData?.limit?.shareTeam} >
+            {teamList.map((item) => (
+                <option key={item._id} value={item._id}>
+                  {item.name}
+                </option>
+            ))}
+          </Select>
         </Flex>
       </ModalBody>
 

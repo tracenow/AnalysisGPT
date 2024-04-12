@@ -1,5 +1,6 @@
 import type { UserModelSchema } from '../type';
 import type { TeamMemberRoleEnum, TeamMemberStatusEnum } from './constant';
+import {PermissionTypeEnum} from "../../permission/constant";
 
 export type TeamSchema = {
   _id: string;
@@ -13,6 +14,10 @@ export type TeamSchema = {
     lastExportDatasetTime: Date;
     lastWebsiteSyncTime: Date;
   };
+};
+export type TeamListItemType = {
+  _id: string;
+  name: string;
 };
 export type tagsType = {
   label: string;

@@ -59,6 +59,14 @@ const Navbar = ({ unread }: { unread: number }) => {
         forbidUserType: ['app']
       },
       {
+        label: t('navbar.Apps'),
+        icon: 'core/app/aiLight',
+        activeIcon: 'core/app/aiFill',
+        link: `/app/share`,
+        activeLink: ['/app/share'],
+        forbidUserType: ['platform']
+      },
+      {
         label: t('navbar.Account'),
         icon: 'support/user/userLight',
         activeIcon: 'support/user/userFill',
