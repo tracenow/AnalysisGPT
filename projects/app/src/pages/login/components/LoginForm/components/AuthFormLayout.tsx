@@ -83,7 +83,7 @@ const FormLayout = ({ children, setPageType, pageType }: Props) => {
           <Image src={AUTH_LOGO_ICON} w={'24px'} alt={'icon'} />
         </Flex>
         <Box ml={3} fontSize={['2xl', '3xl']} fontWeight={'bold'}>
-          Analysis Copilot
+          Insight Copilot
         </Box>
       </Flex>
       {children}
