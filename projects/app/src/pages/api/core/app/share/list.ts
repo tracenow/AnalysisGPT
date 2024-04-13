@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       acc[curr.appId] = curr.shareId
       return acc;
     }, {})
-    console.log(Object.keys(shareAppDict))
+
     // 根据 userId 获取模型信息
     const myApps = await MongoApp.find(
       { _id: {$in: Object.keys(shareAppDict)} },
