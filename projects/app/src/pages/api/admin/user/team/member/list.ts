@@ -4,7 +4,7 @@ import { connectToDatabase } from '@/service/mongo';
 import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { addHours } from 'date-fns';
 
-import { MongoTeamMember } from '@fastgpt/service/support/user/team/TeamMemberSchema';
+import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {

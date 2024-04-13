@@ -29,7 +29,7 @@ export interface AppSchema {
 
 export type AppListItemType = {
   _id: string;
-  shareId: string;
+  shareId?: string;
   name: string;
   avatar: string;
   intro: string;

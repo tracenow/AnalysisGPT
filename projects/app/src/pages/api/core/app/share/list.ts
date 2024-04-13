@@ -14,14 +14,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     // 根据teamId获取被分享的应用
     const myOutLinks = await MongoOutLink.find({"limit.shareTeam": teamId, "type": "share"}, '_id appId shareId')
-    const shareAppDict = myOutLinks.reduce((acc, curr) => {
-      acc[curr.appId] = curr.shareId
-      return acc;
-    }, {})
+    let shareAppDict: Map<string, string> = new Map()
+    let shareApps: Array<string> = new Array()
+    myOutLinks.forEach((item) => {
+      shareAppDict.set(item.appId.toString(), item.shareId.toString())
+      shareApps.push(item.appId.toString())
+    })
 
     // 根据 userId 获取模型信息
     const myApps = await MongoApp.find(
-      { _id: {$in: Object.keys(shareAppDict)} },
+      { _id: {$in: shareApps }},
       '_id avatar name intro tmbId permission'
     ).sort({
       updateTime: -1
@@ -29,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     jsonRes<AppListItemType[]>(res, {
       data: myApps.map((app) => ({
         _id: app._id,
-        shareId: shareAppDict[app._id],
+        shareId: shareAppDict.get(app._id),
         avatar: app.avatar,
         name: app.name,
         intro: app.intro,
