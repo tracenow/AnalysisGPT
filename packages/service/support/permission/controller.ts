@@ -58,8 +58,6 @@ export async function parseHeaderCert({
     const cookies = Cookie.parse(cookie || '');
     const cookieToken = token || cookies.token;
 
-    console.log("token: " + token)
-
     if (!cookieToken) {
       return Promise.reject(ERROR_ENUM.unAuthorization);
     }
@@ -108,8 +106,6 @@ export async function parseHeaderCert({
   }
   // root user
   async function parseRootKey(rootKey?: string) {
-    console.log(rootKey)
-    console.log(process.env.ROOT_KEY)
     if (!rootKey || !process.env.ROOT_KEY || rootKey !== process.env.ROOT_KEY) {
       return Promise.reject(ERROR_ENUM.unAuthorization);
     }
