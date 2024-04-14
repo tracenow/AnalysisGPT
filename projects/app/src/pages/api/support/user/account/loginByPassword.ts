@@ -32,9 +32,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const user = await MongoUser.findOne({
-      username,
-      password
+      username: username,
+      password: password
     });
+
+    console.log(username)
+    console.log(password)
+    console.log(JSON.stringify(user))
 
     if (!user) {
       throw new Error('密码错误');
