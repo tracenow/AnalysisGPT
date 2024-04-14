@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
     if (!history || !modules || !prompt || prompt.length === 0) {
-      throw new Error('Prams Error');
+      throw new Error('Params Error');
     }
     if (!Array.isArray(modules)) {
       throw new Error('history is not array');
