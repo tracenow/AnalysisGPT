@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const user = req.body as UserModelSchema;
 
-        if (!(user.userType == UserTypeEnum.app)) {
+        if (user.username == 'root') {
             throw new Error('参数错误');
         }
 

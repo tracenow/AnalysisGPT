@@ -6,7 +6,6 @@ import { addHours } from 'date-fns';
 
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import {UserTypeEnum} from "@fastgpt/global/support/user/constant";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -14,10 +13,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await authCert({ req, authRoot: true });
 
         const user = req.body as UserModelSchema;
-
-        if (!(user.userType == UserTypeEnum.app)) {
-            throw new Error('参数错误');
-        }
 
         const response = await MongoUser.create(user);
 
