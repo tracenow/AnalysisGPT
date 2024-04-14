@@ -5,7 +5,6 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { addHours } from 'date-fns';
 
 import { MongoUser } from '@fastgpt/service/support/user/schema';
-import {UserTypeEnum} from "@fastgpt/global/support/user/constant";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -13,7 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await authCert({ req, authRoot: true });
 
         const response = await MongoUser.find({
-            userType: UserTypeEnum.app
+            username: {
+                $ne: "root"
+            }
         });
 
         jsonRes(res, {

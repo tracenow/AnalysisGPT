@@ -21,7 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const response = await MongoUser.updateOne({
             _id: user._id,
-            userType: UserTypeEnum.app
+            username: {
+                $ne: "root"
+            }
         }, user);
 
         jsonRes(res, {
