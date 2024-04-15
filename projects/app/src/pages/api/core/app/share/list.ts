@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     let shareApps: Array<string> = new Array()
     myOutLinks.forEach((item) => {
       shareAppDict.set(item.appId.toString(), item.shareId.toString())
-      shareApps.push(item.appId.toString())
+      shareApps.push(item.appId)
     })
 
     // 根据 userId 获取模型信息
@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     jsonRes<AppListItemType[]>(res, {
       data: myApps.map((app) => ({
         _id: app._id,
-        shareId: shareAppDict.get(app._id),
+        shareId: shareAppDict.get(app._id.toString()),
         avatar: app.avatar,
         name: app.name,
         intro: app.intro,
