@@ -285,8 +285,14 @@ function EditLinkModal({
   });
 
   const {
-    data: teamList = [],
+    data: queryTeamList = [],
   } = useQuery(['getAllTeamList'], () => getAllTeamList());
+    
+  const teamList = [{_id: '-1', name: '无共享'}]
+  queryTeamList.map((item) => {
+    teamList.push(item);
+  })
+    
   return (
     <MyModal
       isOpen={true}
