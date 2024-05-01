@@ -72,10 +72,7 @@ const MyApps = () => {
         gridGap={5}
       >
         {myApps.map((app) => (
-          <MyTooltip
-            key={app._id}
-            label={t('app.To Chat')}
-          >
+          <MyTooltip key={app._id} label={t('app.To Chat')}>
             <Box
               lineHeight={1.5}
               h={'100%'}

@@ -7,21 +7,21 @@ import { addHours } from 'date-fns';
 import { MongoTeamMember } from '@fastgpt/service/support/user/team/teamMemberSchema';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        await connectToDatabase();
-        await authCert({ req, authRoot: true });
+  try {
+    await connectToDatabase();
+    await authCert({ req, authRoot: true });
 
-        const teamMembers = await MongoTeamMember.find();
+    const teamMembers = await MongoTeamMember.find();
 
-        jsonRes(res, {
-            data: teamMembers
-        });
-    } catch (error) {
-        console.log(error);
+    jsonRes(res, {
+      data: teamMembers
+    });
+  } catch (error) {
+    console.log(error);
 
-        jsonRes(res, {
-            code: 500,
-            error
-        });
-    }
+    jsonRes(res, {
+      code: 500,
+      error
+    });
+  }
 }

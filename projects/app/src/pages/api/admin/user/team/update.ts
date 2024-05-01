@@ -5,28 +5,31 @@ import { authCert } from '@fastgpt/service/support/permission/auth/common';
 import { addHours } from 'date-fns';
 
 import { MongoTeam } from '@fastgpt/service/support/user/team/teamSchema';
-import {TeamSchema} from "@fastgpt/global/support/user/team/type";
+import { TeamSchema } from '@fastgpt/global/support/user/team/type';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        await connectToDatabase();
-        await authCert({ req, authRoot: true });
+  try {
+    await connectToDatabase();
+    await authCert({ req, authRoot: true });
 
-        const team = req.body as TeamSchema;
+    const team = req.body as TeamSchema;
 
-        const response = await MongoTeam.updateOne({
-            _id: team._id
-        }, team);
+    const response = await MongoTeam.updateOne(
+      {
+        _id: team._id
+      },
+      team
+    );
 
-        jsonRes(res, {
-            data: response
-        });
-    } catch (error) {
-        console.log(error);
+    jsonRes(res, {
+      data: response
+    });
+  } catch (error) {
+    console.log(error);
 
-        jsonRes(res, {
-            code: 500,
-            error
-        });
-    }
+    jsonRes(res, {
+      code: 500,
+      error
+    });
+  }
 }

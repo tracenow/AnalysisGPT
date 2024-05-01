@@ -36,9 +36,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       password: password
     });
 
-    console.log(username)
-    console.log(password)
-    console.log(JSON.stringify(user))
+    console.log(username);
+    console.log(password);
+    console.log(JSON.stringify(user));
 
     if (!user) {
       throw new Error('密码错误');

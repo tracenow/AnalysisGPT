@@ -8,28 +8,28 @@ import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        await connectToDatabase();
-        await authCert({ req, authRoot: true });
+  try {
+    await connectToDatabase();
+    await authCert({ req, authRoot: true });
 
-        const user = req.body as UserModelSchema;
+    const user = req.body as UserModelSchema;
 
-        const response = await MongoUser.deleteOne({
-            _id: user._id,
-            username: {
-                $ne: "root"
-            }
-        });
+    const response = await MongoUser.deleteOne({
+      _id: user._id,
+      username: {
+        $ne: 'root'
+      }
+    });
 
-        jsonRes(res, {
-            data: response
-        });
-    } catch (error) {
-        console.log(error);
+    jsonRes(res, {
+      data: response
+    });
+  } catch (error) {
+    console.log(error);
 
-        jsonRes(res, {
-            code: 500,
-            error
-        });
-    }
+    jsonRes(res, {
+      code: 500,
+      error
+    });
+  }
 }

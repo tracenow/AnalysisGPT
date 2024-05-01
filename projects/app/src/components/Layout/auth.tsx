@@ -37,11 +37,11 @@ const Auth = ({ children }: { children: JSX.Element }) => {
         console.log('error->', error);
         if (location?.pathname == '/chat/app') {
           router.replace(
-              `/login/auth?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
+            `/login/auth?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
           );
         } else {
           router.replace(
-              `/login?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
+            `/login?lastRoute=${encodeURIComponent(location.pathname + location.search)}`
           );
         }
 

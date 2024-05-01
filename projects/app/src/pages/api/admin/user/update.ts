@@ -6,35 +6,38 @@ import { addHours } from 'date-fns';
 
 import { MongoUser } from '@fastgpt/service/support/user/schema';
 import { UserModelSchema } from '@fastgpt/global/support/user/type';
-import {UserTypeEnum} from "@fastgpt/global/support/user/constant";
+import { UserTypeEnum } from '@fastgpt/global/support/user/constant';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        await connectToDatabase();
-        await authCert({ req, authRoot: true });
+  try {
+    await connectToDatabase();
+    await authCert({ req, authRoot: true });
 
-        const user = req.body as UserModelSchema;
+    const user = req.body as UserModelSchema;
 
-        if (user.username == 'root') {
-            throw new Error('参数错误');
-        }
-
-        const response = await MongoUser.updateOne({
-            _id: user._id,
-            username: {
-                $ne: "root"
-            }
-        }, user);
-
-        jsonRes(res, {
-            data: response
-        });
-    } catch (error) {
-        console.log(error);
-
-        jsonRes(res, {
-            code: 500,
-            error
-        });
+    if (user.username == 'root') {
+      throw new Error('参数错误');
     }
+
+    const response = await MongoUser.updateOne(
+      {
+        _id: user._id,
+        username: {
+          $ne: 'root'
+        }
+      },
+      user
+    );
+
+    jsonRes(res, {
+      data: response
+    });
+  } catch (error) {
+    console.log(error);
+
+    jsonRes(res, {
+      code: 500,
+      error
+    });
+  }
 }

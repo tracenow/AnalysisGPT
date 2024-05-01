@@ -115,7 +115,7 @@ const Account = ({ currentTab }: { currentTab: `${TabEnum}` }) => {
         openConfirm(() => {
           setUserInfo(null);
           if (isPlatformUser) {
-              router.replace('/login');
+            router.replace('/login');
           } else {
             router.replace('/login/auth');
           }
@@ -154,13 +154,11 @@ const Account = ({ currentTab }: { currentTab: `${TabEnum}` }) => {
                 onChange={setCurrentTab}
               />
               <Flex alignItems={'center'}>
-                  {isPlatformUser && (
-                      <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />
-                  )}
+                {isPlatformUser && <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />}
                 {isPlatformUser && (
-                    <Box fontSize={'md'} ml={2}>
-                        V{systemVersion}
-                    </Box>
+                  <Box fontSize={'md'} ml={2}>
+                    V{systemVersion}
+                  </Box>
                 )}
               </Flex>
             </Flex>

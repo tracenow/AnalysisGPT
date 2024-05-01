@@ -18,8 +18,7 @@ import {
 import { FeTeamPlanStatusType, TeamSubSchema } from '@fastgpt/global/support/wallet/sub/type';
 
 /* --------------- team  ---------------- */
-export const getAllTeamList = () =>
-    GET<TeamListItemType[]>(`/support/user/team/list`, {});
+export const getAllTeamList = () => GET<TeamListItemType[]>(`/support/user/team/list`, {});
 export const getTeamList = (status: `${TeamMemberSchema['status']}`) =>
   GET<TeamItemType[]>(`/proApi/support/user/team/list`, { status });
 export const postCreateTeam = (data: CreateTeamProps) =>

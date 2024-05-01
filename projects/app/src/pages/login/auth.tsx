@@ -19,102 +19,102 @@ const ForgetPasswordForm = dynamic(() => import('./components/ForgetPasswordForm
 const WechatForm = dynamic(() => import('./components/LoginForm/WechatForm'));
 
 const Login = () => {
-    const router = useRouter();
-    const { lastRoute = '' } = router.query as { lastRoute: string };
-    const { feConfigs } = useSystemStore();
-    const [pageType, setPageType] = useState<`${LoginPageTypeEnum}`>();
-    const { setUserInfo } = useUserStore();
-    const { setLastChatId, setLastChatAppId } = useChatStore();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
+  const { lastRoute = '' } = router.query as { lastRoute: string };
+  const { feConfigs } = useSystemStore();
+  const [pageType, setPageType] = useState<`${LoginPageTypeEnum}`>();
+  const { setUserInfo } = useUserStore();
+  const { setLastChatId, setLastChatAppId } = useChatStore();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const loginSuccess = useCallback(
-        (res: ResLogin) => {
-            // init store
-            setLastChatId('');
-            setLastChatAppId('');
+  const loginSuccess = useCallback(
+    (res: ResLogin) => {
+      // init store
+      setLastChatId('');
+      setLastChatAppId('');
 
-            setUserInfo(res.user);
-            setToken(res.token);
-            setTimeout(() => {
-                router.push(lastRoute ? decodeURIComponent(lastRoute) : '/app/share');
-            }, 300);
-        },
-        [lastRoute, router, setLastChatId, setLastChatAppId, setUserInfo]
-    );
+      setUserInfo(res.user);
+      setToken(res.token);
+      setTimeout(() => {
+        router.push(lastRoute ? decodeURIComponent(lastRoute) : '/app/share');
+      }, 300);
+    },
+    [lastRoute, router, setLastChatId, setLastChatAppId, setUserInfo]
+  );
 
-    function DynamicComponent({ type }: { type: `${LoginPageTypeEnum}` }) {
+  function DynamicComponent({ type }: { type: `${LoginPageTypeEnum}` }) {
     const TypeMap = {
-    [LoginPageTypeEnum.passwordLogin]: LoginAuthForm,
-    [LoginPageTypeEnum.register]: RegisterForm,
-    [LoginPageTypeEnum.forgetPassword]: ForgetPasswordForm,
-    [LoginPageTypeEnum.wechat]: WechatForm
+      [LoginPageTypeEnum.passwordLogin]: LoginAuthForm,
+      [LoginPageTypeEnum.register]: RegisterForm,
+      [LoginPageTypeEnum.forgetPassword]: ForgetPasswordForm,
+      [LoginPageTypeEnum.wechat]: WechatForm
     };
 
     const Component = TypeMap[type];
 
     return <Component setPageType={setPageType} loginSuccess={loginSuccess} />;
-    }
+  }
 
-    /* default login type */
-    useEffect(() => {
+  /* default login type */
+  useEffect(() => {
     setPageType(
-    feConfigs?.oauth?.wechat ? LoginPageTypeEnum.wechat : LoginPageTypeEnum.passwordLogin
+      feConfigs?.oauth?.wechat ? LoginPageTypeEnum.wechat : LoginPageTypeEnum.passwordLogin
     );
-    }, [feConfigs.oauth]);
-    useEffect(() => {
+  }, [feConfigs.oauth]);
+  useEffect(() => {
     clearToken();
     router.prefetch('/app/list');
-    }, []);
+  }, []);
 
-    return (
+  return (
     <>
-    {feConfigs.googleClientVerKey && (
+      {feConfigs.googleClientVerKey && (
         <Script
-            src={`https://www.recaptcha.net/recaptcha/api.js?render=${feConfigs.googleClientVerKey}`}
+          src={`https://www.recaptcha.net/recaptcha/api.js?render=${feConfigs.googleClientVerKey}`}
         ></Script>
-    )}
-    <Flex
-    alignItems={'center'}
-    justifyContent={'center'}
-    bg={`url('/icon/login-analysis-bg.svg') no-repeat`}
-    backgroundSize={'cover'}
-    userSelect={'none'}
-    h={'100%'}
-    px={[0, '10vw']}
-    >
-    <Flex
-    flexDirection={'column'}
-    w={['100%', 'auto']}
-    h={['100%', '700px']}
-    maxH={['100%', '90vh']}
-    bg={'white'}
-    px={['5vw', '88px']}
-    py={'5vh'}
-    borderRadius={[0, '24px']}
-    boxShadow={[
-    '',
-    '0px 0px 1px 0px rgba(19, 51, 107, 0.20), 0px 32px 64px -12px rgba(19, 51, 107, 0.20)'
-]}
-    >
-    <Box w={['100%', '380px']} flex={'1 0 0'}>
-    {pageType ? (
-        <DynamicComponent type={pageType} />
-    ) : (
-        <Center w={'full'} h={'full'} position={'relative'}>
-            <Loading fixed={false} />
-        </Center>
-    )}
-    </Box>
-    </Flex>
-    </Flex>
+      )}
+      <Flex
+        alignItems={'center'}
+        justifyContent={'center'}
+        bg={`url('/icon/login-analysis-bg.svg') no-repeat`}
+        backgroundSize={'cover'}
+        userSelect={'none'}
+        h={'100%'}
+        px={[0, '10vw']}
+      >
+        <Flex
+          flexDirection={'column'}
+          w={['100%', 'auto']}
+          h={['100%', '700px']}
+          maxH={['100%', '90vh']}
+          bg={'white'}
+          px={['5vw', '88px']}
+          py={'5vh'}
+          borderRadius={[0, '24px']}
+          boxShadow={[
+            '',
+            '0px 0px 1px 0px rgba(19, 51, 107, 0.20), 0px 32px 64px -12px rgba(19, 51, 107, 0.20)'
+          ]}
+        >
+          <Box w={['100%', '380px']} flex={'1 0 0'}>
+            {pageType ? (
+              <DynamicComponent type={pageType} />
+            ) : (
+              <Center w={'full'} h={'full'} position={'relative'}>
+                <Loading fixed={false} />
+              </Center>
+            )}
+          </Box>
+        </Flex>
+      </Flex>
     </>
-    );
-    };
+  );
+};
 
 export async function getServerSideProps(context: any) {
-    return {
-        props: { ...(await serviceSideProps(context)) }
-    };
+  return {
+    props: { ...(await serviceSideProps(context)) }
+  };
 }
 
 export default Login;
