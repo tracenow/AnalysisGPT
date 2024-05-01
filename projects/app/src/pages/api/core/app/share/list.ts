@@ -31,16 +31,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     ).sort({
       updateTime: -1
     });
+
+    const queryResult = myApps.map((app) => ({
+      _id: app._id,
+      shareId: shareAppDict.get(String(app._id)),
+      avatar: app.avatar,
+      name: app.name,
+      intro: app.intro,
+      isOwner: teamOwner || String(app.tmbId) === tmbId,
+      permission: app.permission
+    }));
+
+    console.log('queryResult : ' + JSON.stringify(queryResult));
+
     jsonRes<AppListItemType[]>(res, {
-      data: myApps.map((app) => ({
-        _id: app._id,
-        shareId: shareAppDict.get(app._id),
-        avatar: app.avatar,
-        name: app.name,
-        intro: app.intro,
-        isOwner: teamOwner || String(app.tmbId) === tmbId,
-        permission: app.permission
-      }))
+      data: queryResult
     });
   } catch (err) {
     jsonRes(res, {
