@@ -47,6 +47,13 @@ const OutLinkSchema = new Schema({
     default: false
   },
   limit: {
+    authEnable: {
+      type: Boolean,
+      default: false
+    },
+    shareTeam: {
+      type: String
+    },
     maxUsagePoints: {
       type: Number,
       default: -1
@@ -80,13 +87,6 @@ const OutLinkSchema = new Schema({
     type: String
   },
   defaultResponse: {
-    type: String
-  },
-  authEnable: {
-    type: Boolean,
-    default: false
-  },
-  shareTeam: {
     type: String
   }
 });
