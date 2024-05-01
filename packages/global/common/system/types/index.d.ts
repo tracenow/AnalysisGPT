@@ -37,6 +37,7 @@ export type FastGPTFeConfigsType = {
   chatbotUrl?: string;
   openAPIDocUrl?: string;
   systemTitle?: string;
+  systemDescription?: string;
   googleClientVerKey?: string;
   isPlus?: boolean;
   show_phoneLogin?: boolean;
@@ -55,7 +56,9 @@ export type FastGPTFeConfigsType = {
   customApiDomain?: string;
   customSharePageDomain?: string;
 
+  uploadFileMaxAmount?: number;
   uploadFileMaxSize?: number;
+  lafEnv?: string;
 };
 
 export type SystemEnvType = {

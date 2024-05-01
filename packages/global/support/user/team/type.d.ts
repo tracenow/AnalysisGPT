@@ -1,6 +1,7 @@
 import type { UserModelSchema } from '../type';
 import type { TeamMemberRoleEnum, TeamMemberStatusEnum } from './constant';
-import {PermissionTypeEnum} from "../../permission/constant";
+import { PermissionTypeEnum } from '../../permission/constant';
+import { LafAccountType } from './type';
 
 export type TeamSchema = {
   _id: string;
@@ -14,6 +15,7 @@ export type TeamSchema = {
     lastExportDatasetTime: Date;
     lastWebsiteSyncTime: Date;
   };
+  lafAccount: LafAccountType;
 };
 export type TeamListItemType = {
   _id: string;
@@ -63,6 +65,7 @@ export type TeamItemType = {
   role: `${TeamMemberRoleEnum}`;
   status: `${TeamMemberStatusEnum}`;
   canWrite: boolean;
+  lafAccount?: LafAccountType;
 };
 
 export type TeamMemberItemType = {
@@ -78,4 +81,10 @@ export type TeamMemberItemType = {
 export type TeamTagItemType = {
   label: string;
   key: string;
+};
+
+export type LafAccountType = {
+  token: string;
+  appid: string;
+  pat: string;
 };

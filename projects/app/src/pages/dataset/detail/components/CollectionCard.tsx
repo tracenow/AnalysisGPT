@@ -32,13 +32,12 @@ import MyIcon from '@fastgpt/web/components/common/Icon';
 import MyInput from '@/components/MyInput';
 import dayjs from 'dayjs';
 import { useRequest } from '@fastgpt/web/hooks/useRequest';
-import { useLoading } from '@fastgpt/web/hooks/useLoading';
 import { useRouter } from 'next/router';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
-import MyMenu from '@/components/MyMenu';
+import MyMenu from '@fastgpt/web/components/common/MyMenu';
 import { useEditTitle } from '@/web/common/hooks/useEditTitle';
 import type { DatasetCollectionsListItemType } from '@/global/core/dataset/type.d';
-import EmptyTip from '@/components/EmptyTip';
+import EmptyTip from '@fastgpt/web/components/common/EmptyTip';
 import {
   DatasetCollectionTypeEnum,
   TrainingModeEnum,
@@ -61,12 +60,12 @@ import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 import { useDatasetStore } from '@/web/core/dataset/store/dataset';
 import { DatasetSchemaType } from '@fastgpt/global/core/dataset/type';
 import { DatasetCollectionSyncResultEnum } from '@fastgpt/global/core/dataset/constants';
-import MyBox from '@/components/common/MyBox';
-import { ImportDataSourceEnum } from './Import';
+import MyBox from '@fastgpt/web/components/common/MyBox';
 import { usePagination } from '@fastgpt/web/hooks/usePagination';
+import { ImportDataSourceEnum } from '@fastgpt/global/core/dataset/constants';
 
 const WebSiteConfigModal = dynamic(() => import('./Import/WebsiteConfig'), {});
-const FileSourceSelector = dynamic(() => import('./Import/sourceSelector/FileSourceSelector'), {});
+const FileSourceSelector = dynamic(() => import('./Import/components/FileSourceSelector'), {});
 
 const CollectionCard = () => {
   const BoxRef = useRef<HTMLDivElement>(null);
@@ -76,14 +75,14 @@ const CollectionCard = () => {
   const { toast } = useToast();
   const { parentId = '', datasetId } = router.query as { parentId: string; datasetId: string };
   const { t } = useTranslation();
-  const { Loading } = useLoading();
   const { isPc } = useSystemStore();
   const { userInfo } = useUserStore();
   const [searchText, setSearchText] = useState('');
   const { datasetDetail, updateDataset, startWebsiteSync, loadDatasetDetail } = useDatasetStore();
 
   const { openConfirm: openDeleteConfirm, ConfirmModal: ConfirmDeleteModal } = useConfirm({
-    content: t('dataset.Confirm to delete the file')
+    content: t('dataset.Confirm to delete the file'),
+    type: 'delete'
   });
   const { openConfirm: openSyncConfirm, ConfirmModal: ConfirmSyncModal } = useConfirm({
     content: t('core.dataset.collection.Start Sync Tip')
@@ -452,7 +451,7 @@ const CollectionCard = () => {
                           query: {
                             ...router.query,
                             currentTab: TabEnum.import,
-                            source: ImportDataSourceEnum.tableLocal
+                            source: ImportDataSourceEnum.csvTable
                           }
                         })
                     }

@@ -28,7 +28,9 @@ export const simpleText = (text = '') => {
 /* 
   replace {{variable}} to value
 */
-export function replaceVariable(text: string, obj: Record<string, string | number>) {
+export function replaceVariable(text: any, obj: Record<string, string | number>) {
+  if (!(typeof text === 'string')) return text;
+
   for (const key in obj) {
     const val = obj[key];
     if (!['string', 'number'].includes(typeof val)) continue;
@@ -51,3 +53,5 @@ export const replaceSensitiveText = (text: string) => {
 export const getNanoid = (size = 12) => {
   return customAlphabet('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', size)();
 };
+
+export const replaceRegChars = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

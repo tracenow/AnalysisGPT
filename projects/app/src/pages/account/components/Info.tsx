@@ -8,7 +8,8 @@ import {
   Input,
   Link,
   Progress,
-  Grid
+  Grid,
+  Image
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { UserUpdateParams } from '@/types/user';
@@ -41,12 +42,14 @@ import {
 } from '@/web/support/wallet/sub/constants';
 
 import StandardPlanContentList from '@/components/support/wallet/StandardPlanContentList';
+import { TeamMemberRoleEnum } from '@fastgpt/global/support/user/team/constant';
 
 const StandDetailModal = dynamic(() => import('./standardDetailModal'));
 const TeamMenu = dynamic(() => import('@/components/support/user/team/TeamMenu'));
 const PayModal = dynamic(() => import('./PayModal'));
 const UpdatePswModal = dynamic(() => import('./UpdatePswModal'));
 const OpenAIAccountModal = dynamic(() => import('./OpenAIAccountModal'));
+const LafAccountModal = dynamic(() => import('@/components/support/laf/LafAccountModal'));
 const CommunityModal = dynamic(() => import('@/components/CommunityModal'));
 
 const Account = () => {
@@ -249,12 +252,12 @@ const MyInfo = () => {
           </Flex>
         )}
         {isPlatformUser && (
-            <Flex mt={6} alignItems={'center'}>
-              <Box flex={'0 0 80px'}>{t('user.Team')}:&nbsp;</Box>
-              <Box flex={1}>
-                <TeamMenu />
-              </Box>
-            </Flex>
+          <Flex mt={6} alignItems={'center'}>
+            <Box flex={'0 0 80px'}>{t('user.Team')}:&nbsp;</Box>
+            <Box flex={1}>
+              <TeamMenu />
+            </Box>
+          </Flex>
         )}
         {feConfigs.isPlus && (
           <Box mt={6} whiteSpace={'nowrap'}>
@@ -400,14 +403,22 @@ const PlanUsage = () => {
             <Box fontWeight={'bold'} fontSize="xl">
               {t(planName)}
             </Box>
-            <Flex mt="2" color={'#485264'} fontSize="sm">
-              <Box>{t('support.wallet.Plan expired time')}:</Box>
-              <Box ml={2}>{formatTime2YMD(standardPlan?.expiredTime)}</Box>
-            </Flex>
-            {isFreeTeam && (
-              <Box mt="2" color={'#485264'} fontSize="sm">
-                免费版用户30天无任何使用记录时，系统会自动清理账号知识库。
-              </Box>
+
+            {isFreeTeam ? (
+              <>
+                <Flex mt="2" color={'#485264'} fontSize="sm">
+                  <Box>{t('support.wallet.Plan reset time')}:</Box>
+                  <Box ml={2}>{formatTime2YMD(standardPlan?.expiredTime)}</Box>
+                </Flex>
+                <Box mt="2" color={'#485264'} fontSize="sm">
+                  免费版用户30天无任何使用记录时，系统会自动清理账号知识库。
+                </Box>
+              </>
+            ) : (
+              <Flex mt="2" color={'#485264'} fontSize="sm">
+                <Box>{t('support.wallet.Plan expired time')}:</Box>
+                <Box ml={2}>{formatTime2YMD(standardPlan?.expiredTime)}</Box>
+              </Flex>
             )}
           </Box>
           <Button onClick={() => router.push('/price')}>
@@ -513,7 +524,7 @@ const Other = () => {
   const { reset } = useForm<UserUpdateParams>({
     defaultValues: userInfo as UserType
   });
-
+  const { isOpen: isOpenLaf, onClose: onCloseLaf, onOpen: onOpenLaf } = useDisclosure();
   const { isOpen: isOpenOpenai, onClose: onCloseOpenai, onOpen: onOpenOpenai } = useDisclosure();
   const { isOpen: isOpenConcat, onClose: onCloseConcat, onOpen: onOpenConcat } = useDisclosure();
 
@@ -559,20 +570,20 @@ const Other = () => {
             </Box>
           </Link>
         )}
-        {isPlatformUser && (
+        {isPlatformUser && feConfigs?.chatbotUrl && (
           <Link
-              href={feConfigs.chatbotUrl}
-              target="_blank"
-              display={'flex'}
-              py={3}
-              px={6}
-              bg={'white'}
-              border={theme.borders.sm}
-              borderWidth={'1.5px'}
-              borderRadius={'md'}
-              alignItems={'center'}
-              userSelect={'none'}
-              textDecoration={'none !important'}
+            href={feConfigs.chatbotUrl}
+            target="_blank"
+            display={'flex'}
+            py={3}
+            px={6}
+            bg={'white'}
+            border={theme.borders.sm}
+            borderWidth={'1.5px'}
+            borderRadius={'md'}
+            alignItems={'center'}
+            userSelect={'none'}
+            textDecoration={'none !important'}
           >
             <MyIcon name={'core/app/aiLight'} w={'18px'} />
             <Box ml={2} flex={1}>
@@ -580,7 +591,34 @@ const Other = () => {
             </Box>
           </Link>
         )}
-        {feConfigs?.show_openai_account && isPlatformUser && (
+
+        {feConfigs?.lafEnv && userInfo?.team.role === TeamMemberRoleEnum.owner && (
+          <Flex
+            bg={'white'}
+            py={4}
+            px={6}
+            border={theme.borders.sm}
+            borderWidth={'1.5px'}
+            borderRadius={'md'}
+            alignItems={'center'}
+            cursor={'pointer'}
+            userSelect={'none'}
+            onClick={onOpenLaf}
+          >
+            <Image src="/imgs/workflow/laf.png" w={'18px'} alt="laf" />
+            <Box ml={2} flex={1}>
+              laf 账号
+            </Box>
+            <Box
+              w={'9px'}
+              h={'9px'}
+              borderRadius={'50%'}
+              bg={userInfo?.team.lafAccount?.token ? '#67c13b' : 'myGray.500'}
+            />
+          </Flex>
+        )}
+
+        {feConfigs?.show_openai_account && (
           <Flex
             bg={'white'}
             py={4}
@@ -618,7 +656,10 @@ const Other = () => {
         )}
       </Grid>
 
-      {isOpenOpenai && isPlatformUser && (
+      {isPlatformUser && isOpenLaf && userInfo && (
+        <LafAccountModal defaultData={userInfo?.team.lafAccount} onClose={onCloseLaf} />
+      )}
+      {isOpenOpenai && isPlatformUser && userInfo && (
         <OpenAIAccountModal
           defaultData={userInfo?.openaiAccount}
           onSuccess={(data) =>

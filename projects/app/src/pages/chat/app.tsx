@@ -1,425 +1,379 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Box, Flex, useDisclosure, Drawer, DrawerOverlay, DrawerContent } from '@chakra-ui/react';
-import { useToast } from '@fastgpt/web/hooks/useToast';
+import { getInitChatInfo } from '@/web/core/chat/api';
+import {
+  Box,
+  Flex,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  useTheme
+} from '@chakra-ui/react';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
 import { useQuery } from '@tanstack/react-query';
 import { streamFetch } from '@/web/common/api/fetch';
-import { useShareChatStore } from '@/web/core/chat/storeShareChat';
-import SideBar from '@/components/SideBar';
-import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
-import { getErrText } from '@fastgpt/global/common/error/utils';
-import type { ChatHistoryItemType, ChatSiteItemType } from '@fastgpt/global/core/chat/type.d';
+import { useChatStore } from '@/web/core/chat/storeChat';
+import { useLoading } from '@fastgpt/web/hooks/useLoading';
+import { useToast } from '@fastgpt/web/hooks/useToast';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 12);
+import type { ChatHistoryItemType } from '@fastgpt/global/core/chat/type.d';
+import { useTranslation } from 'next-i18next';
 
 import ChatBox from '@/components/ChatBox';
 import type { ComponentRef, StartChatFnProps } from '@/components/ChatBox/type.d';
 import PageContainer from '@/components/PageContainer';
-import ChatHeader from './components/ChatHeader';
+import SideBar from '@/components/SideBar';
 import ChatHistorySlider from './components/ChatHistorySlider';
-import { serviceSideProps } from '@/web/common/utils/i18n';
-import { checkChatSupportSelectFileByChatModels } from '@/web/core/chat/utils';
-import { useTranslation } from 'next-i18next';
-import { getInitOutLinkChatInfo } from '@/web/core/chat/api';
-import { getChatTitleFromChatMessage } from '@fastgpt/global/core/chat/utils';
-import { useChatStore } from '@/web/core/chat/storeChat';
-import { ChatRoleEnum, ChatStatusEnum } from '@fastgpt/global/core/chat/constants';
-import MyBox from '@/components/common/MyBox';
-import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
-import { OutLinkWithAppType } from '@fastgpt/global/support/outLink/type';
-
+import SliderApps from './components/SliderApps';
+import ChatHeader from './components/ChatHeader';
+import { getErrText } from '@fastgpt/global/common/error/utils';
 import { useUserStore } from '@/web/support/user/useUserStore';
+import { serviceSideProps } from '@/web/common/utils/i18n';
+import { useAppStore } from '@/web/core/app/store/useAppStore';
+import { checkChatSupportSelectFileByChatModels } from '@/web/core/chat/utils';
+import { getChatTitleFromChatMessage } from '@fastgpt/global/core/chat/utils';
+import { ChatStatusEnum } from '@fastgpt/global/core/chat/constants';
+import { GPTMessages2Chats } from '@fastgpt/global/core/chat/adapt';
 
-const OutLink = ({
-                     appName,
-                     appIntro,
-                     appAvatar
-                 }: {
-    appName?: string;
-    appIntro?: string;
-    appAvatar?: string;
-}) => {
-    const { t } = useTranslation();
-    const router = useRouter();
-    const {
-        shareId = '',
-        chatId = '',
-        showHistory = '1',
-        authToken,
-        ...customVariables
-    } = router.query as {
-        shareId: string;
-        chatId: string;
-        showHistory: '0' | '1';
-        authToken: string;
-        [key: string]: string;
-    };
-    const { toast } = useToast();
-    const { isOpen: isOpenSlider, onClose: onCloseSlider, onOpen: onOpenSlider } = useDisclosure();
-    const { isPc } = useSystemStore();
-    const ChatBoxRef = useRef<ComponentRef>(null);
-    const forbidRefresh = useRef(false);
-    const initSign = useRef(false);
-    const [isEmbed, setIdEmbed] = useState(true);
+const Chat = ({ appId, chatId }: { appId: string; chatId: string }) => {
+  const router = useRouter();
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const { toast } = useToast();
 
-    const { userInfo } = useUserStore();
-    const { localUId } = useShareChatStore();
-    const {
-        histories,
-        loadHistories,
-        pushHistory,
-        updateHistory,
-        delOneHistory,
-        chatData,
-        setChatData,
-        delOneHistoryItem,
-        clearHistories
-    } = useChatStore();
-    const appId = chatData.appId;
-    const outLinkUid: string = userInfo?._id || authToken || localUId;
+  const ChatBoxRef = useRef<ComponentRef>(null);
+  const forbidRefresh = useRef(false);
 
-    const startChat = useCallback(
-        async ({ messages, controller, generatingMessage, variables }: StartChatFnProps) => {
-            const prompts = messages.slice(-2);
-            const completionChatId = chatId ? chatId : nanoid();
+  const {
+    lastChatAppId,
+    setLastChatAppId,
+    lastChatId,
+    setLastChatId,
+    histories,
+    loadHistories,
+    pushHistory,
+    updateHistory,
+    delOneHistory,
+    clearHistories,
+    chatData,
+    setChatData,
+    delOneHistoryItem
+  } = useChatStore();
+  const { myApps, loadMyApps } = useAppStore();
+  const { userInfo } = useUserStore();
 
-            const { responseText, responseData } = await streamFetch({
-                data: {
-                    messages: prompts,
-                    variables: {
-                        ...customVariables,
-                        ...variables
-                    },
-                    shareId,
-                    chatId: completionChatId,
-                    outLinkUid
-                },
-                onMessage: generatingMessage,
-                abortCtrl: controller
-            });
+  const { isPc } = useSystemStore();
+  const { Loading, setIsLoading } = useLoading();
+  const { isOpen: isOpenSlider, onClose: onCloseSlider, onOpen: onOpenSlider } = useDisclosure();
 
-            const newTitle = getChatTitleFromChatMessage(GPTMessages2Chats(prompts)[0]);
+  const startChat = useCallback(
+    async ({ messages, controller, generatingMessage, variables }: StartChatFnProps) => {
+      const prompts = messages.slice(-2);
+      const completionChatId = chatId ? chatId : nanoid();
 
-            // new chat
-            if (completionChatId !== chatId) {
-                const newHistory: ChatHistoryItemType = {
-                    chatId: completionChatId,
-                    updateTime: new Date(),
-                    title: newTitle,
-                    appId,
-                    top: false
-                };
-                pushHistory(newHistory);
-                if (controller.signal.reason !== 'leave') {
-                    forbidRefresh.current = true;
-                    router.replace({
-                        query: {
-                            ...router.query,
-                            chatId: completionChatId
-                        }
-                    });
-                }
-            } else {
-                // update chat
-                const currentChat = histories.find((item) => item.chatId === chatId);
-                currentChat &&
-                updateHistory({
-                    ...currentChat,
-                    updateTime: new Date(),
-                    title: newTitle,
-                    shareId,
-                    outLinkUid
-                });
+      const { responseText, responseData } = await streamFetch({
+        data: {
+          messages: prompts,
+          variables,
+          appId,
+          chatId: completionChatId
+        },
+        onMessage: generatingMessage,
+        abortCtrl: controller
+      });
+
+      const newTitle = getChatTitleFromChatMessage(GPTMessages2Chats(prompts)[0]);
+
+      // new chat
+      if (completionChatId !== chatId) {
+        const newHistory: ChatHistoryItemType = {
+          chatId: completionChatId,
+          updateTime: new Date(),
+          title: newTitle,
+          appId,
+          top: false
+        };
+        pushHistory(newHistory);
+        if (controller.signal.reason !== 'leave') {
+          forbidRefresh.current = true;
+          router.replace({
+            query: {
+              chatId: completionChatId,
+              appId
             }
+          });
+        }
+      } else {
+        // update chat
+        const currentChat = histories.find((item) => item.chatId === chatId);
+        currentChat &&
+          updateHistory({
+            ...currentChat,
+            updateTime: new Date(),
+            title: newTitle
+          });
+      }
+      // update chat window
+      setChatData((state) => ({
+        ...state,
+        title: newTitle,
+        history: ChatBoxRef.current?.getChatHistories() || state.history
+      }));
 
-            // update chat window
-            setChatData((state) => ({
-                ...state,
-                title: newTitle,
-                history: ChatBoxRef.current?.getChatHistories() || state.history
-            }));
+      return { responseText, responseData, isNewChat: forbidRefresh.current };
+    },
+    [appId, chatId, histories, pushHistory, router, setChatData, updateHistory]
+  );
 
-            /* post message to report result */
-            const result: ChatSiteItemType[] = GPTMessages2Chats(prompts).map((item) => ({
-                ...item,
-                status: 'finish'
-            }));
+  useQuery(['loadModels'], () => loadMyApps(false));
 
-            window.top?.postMessage(
-                {
-                    type: 'shareChatFinish',
-                    data: {
-                        question: result[0]?.value,
-                        answer: responseText
-                    }
-                },
-                '*'
+  // get chat app info
+  const loadChatInfo = useCallback(
+    async ({
+      appId,
+      chatId,
+      loading = false
+    }: {
+      appId: string;
+      chatId: string;
+      loading?: boolean;
+    }) => {
+      try {
+        loading && setIsLoading(true);
+        const res = await getInitChatInfo({ appId, chatId });
+        const history = res.history.map((item) => ({
+          ...item,
+          dataId: item.dataId || nanoid(),
+          status: ChatStatusEnum.finish
+        }));
+
+        setChatData({
+          ...res,
+          history
+        });
+
+        // have records.
+        ChatBoxRef.current?.resetHistory(history);
+        ChatBoxRef.current?.resetVariables(res.variables);
+        if (res.history.length > 0) {
+          setTimeout(() => {
+            ChatBoxRef.current?.scrollToBottom('auto');
+          }, 500);
+        }
+      } catch (e: any) {
+        // reset all chat tore
+        setLastChatAppId('');
+        setLastChatId('');
+        toast({
+          title: getErrText(e, t('core.chat.Failed to initialize chat')),
+          status: 'error'
+        });
+        if (e?.code === 501) {
+          router.replace('/app/list');
+        } else if (chatId) {
+          router.replace({
+            query: {
+              ...router.query,
+              chatId: ''
+            }
+          });
+        }
+      }
+      setIsLoading(false);
+      return null;
+    },
+    [setIsLoading, setChatData, setLastChatAppId, setLastChatId, toast, t, router]
+  );
+  // 初始化聊天框
+  useQuery(['init', { appId, chatId }], () => {
+    // pc: redirect to latest model chat
+    if (!appId && lastChatAppId) {
+      return router.replace({
+        query: {
+          appId: lastChatAppId,
+          chatId: lastChatId
+        }
+      });
+    }
+    if (!appId && myApps[0]) {
+      return router.replace({
+        query: {
+          appId: myApps[0]._id,
+          chatId: lastChatId
+        }
+      });
+    }
+    if (!appId) {
+      (async () => {
+        const apps = await loadMyApps();
+        if (apps.length === 0) {
+          toast({
+            status: 'error',
+            title: t('core.chat.You need to a chat app')
+          });
+          router.replace('/app/list');
+        } else {
+          router.replace({
+            query: {
+              appId: apps[0]._id,
+              chatId: lastChatId
+            }
+          });
+        }
+      })();
+      return;
+    }
+
+    // store id
+    appId && setLastChatAppId(appId);
+    setLastChatId(chatId);
+
+    if (forbidRefresh.current) {
+      forbidRefresh.current = false;
+      return null;
+    }
+
+    return loadChatInfo({
+      appId,
+      chatId,
+      loading: appId !== chatData.appId
+    });
+  });
+
+  useQuery(['loadHistories', appId], () => (appId ? loadHistories({ appId }) : null));
+
+  return (
+    <Flex h={'100%'}>
+      <Head>
+        <title>{chatData.app.name}</title>
+      </Head>
+      {/* pc show myself apps */}
+      {isPc && (
+        <Box borderRight={theme.borders.base} w={'220px'} flexShrink={0}>
+          <SliderApps apps={myApps} activeAppId={appId} />
+        </Box>
+      )}
+
+      <PageContainer flex={'1 0 0'} w={0} p={[0, '16px']} position={'relative'}>
+        <Flex h={'100%'} flexDirection={['column', 'row']} bg={'white'}>
+          {/* pc always show history. */}
+          {((children: React.ReactNode) => {
+            return isPc || !appId ? (
+              <SideBar>{children}</SideBar>
+            ) : (
+              <Drawer
+                isOpen={isOpenSlider}
+                placement="left"
+                autoFocus={false}
+                size={'xs'}
+                onClose={onCloseSlider}
+              >
+                <DrawerOverlay backgroundColor={'rgba(255,255,255,0.5)'} />
+                <DrawerContent maxWidth={'250px'}>{children}</DrawerContent>
+              </Drawer>
             );
-
-            return { responseText, responseData, isNewChat: forbidRefresh.current };
-        },
-        [
-            chatId,
-            customVariables,
-            shareId,
-            outLinkUid,
-            setChatData,
-            appId,
-            pushHistory,
-            router,
-            histories,
-            updateHistory
-        ]
-    );
-
-    const loadChatInfo = useCallback(
-        async (shareId: string, chatId: string) => {
-            if (!shareId) return null;
-
-            try {
-                const res = await getInitOutLinkChatInfo({
-                    chatId,
-                    shareId,
-                    outLinkUid
+          })(
+            <ChatHistorySlider
+              apps={myApps}
+              confirmClearText={t('core.chat.Confirm to clear history')}
+              appId={appId}
+              appName={chatData.app.name}
+              appAvatar={chatData.app.avatar}
+              activeChatId={chatId}
+              onClose={onCloseSlider}
+              history={histories.map((item, i) => ({
+                id: item.chatId,
+                title: item.title,
+                customTitle: item.customTitle,
+                top: item.top
+              }))}
+              onChangeChat={(chatId) => {
+                router.replace({
+                  query: {
+                    chatId: chatId || '',
+                    appId
+                  }
                 });
-                const history = res.history.map((item) => ({
-                    ...item,
-                    status: ChatStatusEnum.finish
-                }));
-
-                setChatData({
-                    ...res,
-                    history
+                if (!isPc) {
+                  onCloseSlider();
+                }
+              }}
+              onDelHistory={(e) => delOneHistory({ ...e, appId })}
+              onClearHistory={() => {
+                clearHistories({ appId });
+                router.replace({
+                  query: {
+                    appId
+                  }
                 });
-
-                ChatBoxRef.current?.resetHistory(history);
-                ChatBoxRef.current?.resetVariables(res.variables);
-
-                // send init message
-                if (!initSign.current) {
-                    initSign.current = true;
-                    if (window !== top) {
-                        window.top?.postMessage({ type: 'shareChatReady' }, '*');
-                    }
-                }
-
-                if (chatId && res.history.length > 0) {
-                    setTimeout(() => {
-                        ChatBoxRef.current?.scrollToBottom('auto');
-                    }, 500);
-                }
-            } catch (e: any) {
-                console.log(e);
-                toast({
-                    status: 'error',
-                    title: getErrText(e, t('core.shareChat.Init Error'))
+              }}
+              onSetHistoryTop={(e) => {
+                updateHistory({ ...e, appId });
+              }}
+              onSetCustomTitle={async (e) => {
+                updateHistory({
+                  appId,
+                  chatId: e.chatId,
+                  title: e.title,
+                  customTitle: e.title
                 });
-                if (chatId) {
-                    router.replace({
-                        query: {
-                            ...router.query,
-                            chatId: ''
-                        }
-                    });
-                }
-            }
+              }}
+            />
+          )}
+          {/* chat container */}
+          <Flex
+            position={'relative'}
+            h={[0, '100%']}
+            w={['100%', 0]}
+            flex={'1 0 0'}
+            flexDirection={'column'}
+          >
+            {/* header */}
+            <ChatHeader
+              appAvatar={chatData.app.avatar}
+              appName={chatData.app.name}
+              appId={appId}
+              history={chatData.history}
+              chatModels={chatData.app.chatModels}
+              onOpenSlider={onOpenSlider}
+              showHistory
+            />
 
-            return null;
-        },
-        [outLinkUid, router, setChatData, t, toast]
-    );
-
-    const { isFetching } = useQuery(['init', shareId, chatId], () => {
-        if (forbidRefresh.current) {
-            forbidRefresh.current = false;
-            return null;
-        }
-
-        return loadChatInfo(shareId, chatId);
-    });
-
-    // load histories
-    useQuery(['loadHistories', outLinkUid, shareId], () => {
-        if (shareId && outLinkUid) {
-            return loadHistories({
-                shareId,
-                outLinkUid
-            });
-        }
-        return null;
-    });
-
-    // window init
-    useEffect(() => {
-        setIdEmbed(window !== top);
-    }, []);
-
-    return (
-        <PageContainer
-            {...(isEmbed
-                ? { p: '0 !important', insertProps: { borderRadius: '0', boxShadow: 'none' } }
-                : { p: [0, 5] })}
-        >
-            <Head>
-                <title>{appName || chatData.app?.name}</title>
-                <meta name="description" content={appIntro} />
-                <link rel="icon" href={appAvatar || chatData.app?.avatar} />
-            </Head>
-            <MyBox
-                isLoading={isFetching}
-                h={'100%'}
-                display={'flex'}
-                flexDirection={['column', 'row']}
-                bg={'white'}
-            >
-                {showHistory === '1'
-                    ? ((children: React.ReactNode) => {
-                        return isPc ? (
-                            <SideBar>{children}</SideBar>
-                        ) : (
-                            <Drawer
-                                isOpen={isOpenSlider}
-                                placement="left"
-                                autoFocus={false}
-                                size={'xs'}
-                                onClose={onCloseSlider}
-                            >
-                                <DrawerOverlay backgroundColor={'rgba(255,255,255,0.5)'} />
-                                <DrawerContent maxWidth={'250px'} boxShadow={'2px 0 10px rgba(0,0,0,0.15)'}>
-                                    {children}
-                                </DrawerContent>
-                            </Drawer>
-                        );
-                    })(
-                        <ChatHistorySlider
-                            appName={chatData.app.name}
-                            appAvatar={chatData.app.avatar}
-                            confirmClearText={t('core.chat.Confirm to clear share chat history')}
-                            activeChatId={chatId}
-                            history={histories.map((item) => ({
-                                id: item.chatId,
-                                title: item.title,
-                                customTitle: item.customTitle,
-                                top: item.top
-                            }))}
-                            onClose={onCloseSlider}
-                            onChangeChat={(chatId) => {
-                                router.replace({
-                                    query: {
-                                        ...router.query,
-                                        chatId: chatId || ''
-                                    }
-                                });
-                                if (!isPc) {
-                                    onCloseSlider();
-                                }
-                            }}
-                            onDelHistory={({ chatId }) =>
-                                delOneHistory({ appId: chatData.appId, chatId, shareId, outLinkUid })
-                            }
-                            onClearHistory={() => {
-                                clearHistories({ shareId, outLinkUid });
-                                router.replace({
-                                    query: {
-                                        ...router.query,
-                                        chatId: ''
-                                    }
-                                });
-                            }}
-                            onSetHistoryTop={(e) => {
-                                updateHistory({
-                                    ...e,
-                                    appId: chatData.appId,
-                                    shareId,
-                                    outLinkUid
-                                });
-                            }}
-                            onSetCustomTitle={async (e) => {
-                                updateHistory({
-                                    appId: chatData.appId,
-                                    chatId: e.chatId,
-                                    title: e.title,
-                                    customTitle: e.title,
-                                    shareId,
-                                    outLinkUid
-                                });
-                            }}
-                        />
-                    )
-                    : null}
-
-                {/* chat container */}
-                <Flex
-                    position={'relative'}
-                    h={[0, '100%']}
-                    w={['100%', 0]}
-                    flex={'1 0 0'}
-                    flexDirection={'column'}
-                >
-                    {/* header */}
-                    <ChatHeader
-                        appAvatar={chatData.app.avatar}
-                        appName={chatData.app.name}
-                        history={chatData.history}
-                        showHistory={showHistory === '1'}
-                        onOpenSlider={onOpenSlider}
-                    />
-                    {/* chat box */}
-                    <Box flex={1}>
-                        <ChatBox
-                            active={!!chatData.app.name}
-                            ref={ChatBoxRef}
-                            appAvatar={chatData.app.avatar}
-                            userAvatar={chatData.userAvatar}
-                            userGuideModule={chatData.app?.userGuideModule}
-                            showFileSelector={checkChatSupportSelectFileByChatModels(chatData.app.chatModels)}
-                            feedbackType={'user'}
-                            onUpdateVariable={(e) => {}}
-                            onStartChat={startChat}
-                            onDelMessage={(e) =>
-                                delOneHistoryItem({ ...e, appId: chatData.appId, chatId, shareId, outLinkUid })
-                            }
-                            appId={chatData.appId}
-                            chatId={chatId}
-                            shareId={shareId}
-                            outLinkUid={outLinkUid}
-                        />
-                    </Box>
-                </Flex>
-            </MyBox>
-        </PageContainer>
-    );
+            {/* chat box */}
+            <Box flex={1}>
+              <ChatBox
+                ref={ChatBoxRef}
+                showEmptyIntro
+                appAvatar={chatData.app.avatar}
+                userAvatar={userInfo?.avatar}
+                userGuideModule={chatData.app?.userGuideModule}
+                showFileSelector={checkChatSupportSelectFileByChatModels(chatData.app.chatModels)}
+                feedbackType={'user'}
+                onStartChat={startChat}
+                onDelMessage={(e) => delOneHistoryItem({ ...e, appId, chatId })}
+                appId={appId}
+                chatId={chatId}
+              />
+            </Box>
+          </Flex>
+        </Flex>
+        <Loading fixed={false} />
+      </PageContainer>
+    </Flex>
+  );
 };
 
 export async function getServerSideProps(context: any) {
-    const shareId = context?.query?.shareId || '';
-
-    const app = await (async () => {
-        try {
-            const app = (await MongoOutLink.findOne(
-                {
-                    shareId
-                },
-                'appId'
-            )
-                .populate('appId', 'name avatar intro')
-                .lean()) as OutLinkWithAppType;
-            return app;
-        } catch (error) {
-            return undefined;
-        }
-    })();
-
-    return {
-        props: {
-            appName: app?.appId?.name || '',
-            appAvatar: app?.appId?.avatar || '',
-            appIntro: app?.appId?.intro || '',
-            ...(await serviceSideProps(context))
-        }
-    };
+  return {
+    props: {
+      appId: context?.query?.appId || '',
+      chatId: context?.query?.chatId || '',
+      ...(await serviceSideProps(context))
+    }
+  };
 }
 
-export default OutLink;
+export default Chat;

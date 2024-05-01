@@ -1,27 +1,31 @@
-import type {
-  AppTTSConfigType,
-  FlowNodeTemplateType,
-  ModuleItemType,
-  VariableItemType
-} from '../module/type.d';
+import type { FlowNodeTemplateType, StoreNodeItemType } from '../workflow/type';
+
 import { AppTypeEnum } from './constants';
 import { PermissionTypeEnum } from '../../support/permission/constant';
-import type { DatasetModuleProps } from '../module/node/type.d';
-import { VariableInputEnum } from '../module/constants';
-import { SelectedDatasetType } from '../module/api';
+import { VariableInputEnum } from '../workflow/constants';
+import { SelectedDatasetType } from '../workflow/api';
 import { DatasetSearchModeEnum } from '../dataset/constants';
 import { TeamTagSchema as TeamTagsSchemaType } from '@fastgpt/global/support/user/team/type.d';
+import { StoreEdgeItemType } from '../workflow/type/edge';
+
 export interface AppSchema {
   _id: string;
-  userId: string;
   teamId: string;
   tmbId: string;
   name: string;
   type: `${AppTypeEnum}`;
+  version?: 'v1' | 'v2';
   avatar: string;
   intro: string;
   updateTime: number;
-  modules: ModuleItemType[];
+
+  modules: StoreNodeItemType[];
+  edges: StoreEdgeItemType[];
+
+  // App system config
+  scheduledTriggerConfig?: AppScheduledTriggerConfigType | null;
+  scheduledTriggerNextTime?: Date;
+
   permission: `${PermissionTypeEnum}`;
   inited?: boolean;
   teamTags: string[];
@@ -83,5 +87,46 @@ export type AppSimpleEditFormType = {
       voice?: string | undefined;
       speed?: number | undefined;
     };
+    whisper: AppWhisperConfigType;
+    scheduleTrigger: AppScheduledTriggerConfigType | null;
   };
+};
+
+/* app function config */
+export type SettingAIDataType = {
+  model: string;
+  temperature: number;
+  maxToken: number;
+  isResponseAnswerText?: boolean;
+  maxHistories?: number;
+};
+
+// variable
+export type VariableItemType = {
+  id: string;
+  key: string;
+  label: string;
+  type: `${VariableInputEnum}`;
+  required: boolean;
+  maxLen: number;
+  enums: { value: string }[];
+};
+// tts
+export type AppTTSConfigType = {
+  type: 'none' | 'web' | 'model';
+  model?: string;
+  voice?: string;
+  speed?: number;
+};
+// whisper
+export type AppWhisperConfigType = {
+  open: boolean;
+  autoSend: boolean;
+  autoTTSResponse: boolean;
+};
+// interval timer
+export type AppScheduledTriggerConfigType = {
+  cronString: string;
+  timezone: string;
+  defaultPrompt: string;
 };

@@ -1,11 +1,11 @@
-import { VariableItemType } from '@fastgpt/global/core/module/type';
+import { VariableItemType } from '@fastgpt/global/core/app/type.d';
 import React, { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'next-i18next';
 import { Box, Button, Card, Input, Textarea } from '@chakra-ui/react';
 import ChatAvatar from './ChatAvatar';
 import { MessageCardStyle } from '../constants';
-import { VariableInputEnum } from '@fastgpt/global/core/module/constants';
+import { VariableInputEnum } from '@fastgpt/global/core/workflow/constants';
 import MySelect from '@fastgpt/web/components/common/MySelect';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import { ChatBoxInputFormType } from '../type.d';

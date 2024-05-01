@@ -25,10 +25,12 @@ import { useTranslation } from 'next-i18next';
 import { getInitOutLinkChatInfo } from '@/web/core/chat/api';
 import { getChatTitleFromChatMessage } from '@fastgpt/global/core/chat/utils';
 import { useChatStore } from '@/web/core/chat/storeChat';
-import { ChatRoleEnum, ChatStatusEnum } from '@fastgpt/global/core/chat/constants';
-import MyBox from '@/components/common/MyBox';
+import { ChatStatusEnum } from '@fastgpt/global/core/chat/constants';
+import MyBox from '@fastgpt/web/components/common/MyBox';
 import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { OutLinkWithAppType } from '@fastgpt/global/support/outLink/type';
+import { addLog } from '@fastgpt/service/common/system/log';
+import { connectToDatabase } from '@/service/mongo';
 
 const OutLink = ({
   appName,
@@ -81,6 +83,17 @@ const OutLink = ({
     async ({ messages, controller, generatingMessage, variables }: StartChatFnProps) => {
       const prompts = messages.slice(-2);
       const completionChatId = chatId ? chatId : nanoid();
+
+      //post message to report chat start
+      window.top?.postMessage(
+        {
+          type: 'shareChatStart',
+          data: {
+            question: prompts[0]?.content
+          }
+        },
+        '*'
+      );
 
       const { responseText, responseData } = await streamFetch({
         data: {
@@ -141,6 +154,7 @@ const OutLink = ({
       /* post message to report result */
       const result: ChatSiteItemType[] = GPTMessages2Chats(prompts).map((item) => ({
         ...item,
+        dataId: item.dataId || nanoid(),
         status: 'finish'
       }));
 
@@ -183,6 +197,7 @@ const OutLink = ({
         });
         const history = res.history.map((item) => ({
           ...item,
+          dataId: item.dataId || nanoid(),
           status: ChatStatusEnum.finish
         }));
 
@@ -395,6 +410,7 @@ export async function getServerSideProps(context: any) {
 
   const app = await (async () => {
     try {
+      await connectToDatabase();
       const app = (await MongoOutLink.findOne(
         {
           shareId
@@ -405,6 +421,7 @@ export async function getServerSideProps(context: any) {
         .lean()) as OutLinkWithAppType;
       return app;
     } catch (error) {
+      addLog.error('getServerSideProps', error);
       return undefined;
     }
   })();
