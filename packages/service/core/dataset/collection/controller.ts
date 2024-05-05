@@ -138,12 +138,14 @@ export const delCollectionRelatedSource = async ({
     .filter(Boolean);
 
   // delete images
+  console.log('delete images');
   await delImgByRelatedId({
     teamId,
     relateIds: relatedImageIds,
     session
   });
   // delete files
+  console.log('delete files');
   await delFileByFileIdList({
     bucketName: BucketNameEnum.dataset,
     fileIdList
@@ -180,25 +182,30 @@ export async function delCollectionAndRelatedSources({
   await delCollectionRelatedSource({ collections, session });
 
   // delete training data
+  console.log('delete training data');
   await MongoDatasetTraining.deleteMany({
     teamId,
     datasetIds: { $in: datasetIds },
     collectionId: { $in: collectionIds }
   });
   // delete dataset.datas
-  await MongoDatasetData.deleteMany(
-    { teamId, datasetIds: { $in: datasetIds }, collectionId: { $in: collectionIds } },
-    { session }
-  );
+  console.log('delete dataset.datas');
+  await MongoDatasetData.deleteMany({
+    teamId,
+    datasetIds: { $in: datasetIds },
+    collectionId: { $in: collectionIds }
+  });
+
+  // no session delete: delete files, vector data
+  console.log('delete files, vector data');
+  await deleteDatasetDataVector({ teamId, datasetIds, collectionIds });
 
   // delete collections
+  console.log('delete collections');
   await MongoDatasetCollection.deleteMany(
     {
       _id: { $in: collectionIds }
     },
     { session }
   );
-
-  // no session delete: delete files, vector data
-  await deleteDatasetDataVector({ teamId, datasetIds, collectionIds });
 }

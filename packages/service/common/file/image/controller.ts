@@ -56,11 +56,8 @@ export async function delImgByRelatedId({
 }) {
   if (relateIds.length === 0) return;
 
-  return MongoImage.deleteMany(
-    {
-      teamId,
-      'metadata.relatedId': { $in: relateIds.map((id) => String(id)) }
-    },
-    { session }
-  );
+  return MongoImage.deleteMany({
+    teamId,
+    'metadata.relatedId': { $in: relateIds.map((id) => String(id)) }
+  });
 }
